@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+{% load querystring from django_tables2 %}
+{% block title %}Vendor{% endblock title %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a class="btn btn-sm btn-success" href="{% url "vendor_create" %}">Add Vendor Details</a>
+                <a class="btn btn-sm btn-outline-success" href="{% querystring '_export'='xlsx' %}">
+                    <i class="fa-solid fa-download"></i> Export to Excel
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Photo</th>
+                            <th>Address</th>
+                            <th>Mobile</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vendor in vendors %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ vendor.name }}</td>
+                            <td><img src="{{ vendor.photo }}" alt="Photo" class="img-fluid" style="width: 50px; height: 50px; border-radius: 50%;"></td>
+                            <td>{{ vendor.address }}</td>
+                            <td>{{ vendor.mobile }}</td>
+                            <td>{{ vendor.status }}</td>
+                            <td>
+                                <a href="{% url "vendor_edit" vendor.id %}" class="btn btn-info btn-sm">Edit</a>
+                                <a href="{% url "vendor_delete" vendor.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>  
+    </div>
+</div>
+{% endblock %}

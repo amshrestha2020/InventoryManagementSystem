@@ -1,0 +1,124 @@
+{% load crispy_forms_tags %}
+{% load static %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-page {
+            width: 360px;
+        }
+        .form {
+            background: #fff;
+            max-width: 360px;
+            margin: 0 auto;
+            padding: 45px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .form input {
+            background: #f2f2f2;
+            width: 100%;
+            border: 1px solid #ddd;
+            margin: 0 0 15px;
+            padding: 15px;
+            box-sizing: border-box;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        .form button {
+            background: #007BFF;
+            width: 100%;
+            border: 0;
+            padding: 15px;
+            color: #fff;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .form button:hover {
+            background: #0056b3;
+        }
+        .form .message {
+            margin: 15px 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .form .message a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .navbar-brand {
+            font-size: 26px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .text-danger {
+            color: #dc3545;
+        }
+        .alert {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-page">
+        <div class="form">
+            <div>
+                <strong class="navbar-brand">Inventory<span class="text-warning">ms</span></strong>
+            </div>
+            <div class="text-danger">
+                {% if messages %} {% for message in messages %}
+                <div class="alert alert-{{message.tags}}">
+                    {{ message }}
+                </div>
+                {% endfor %} {% endif %}
+
+                {% if form.non_field_errors %}
+                    <ul>
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <form class="login-form" method="POST">
+                {% csrf_token %}
+                <p>{{ message }}</p>
+                <label>Username</label>
+                <span class="text-danger">{{ form.username.errors }}</span>
+                {{ form.username }}
+                <label>Email</label>
+                <span class="text-danger">{{ form.email.errors }}</span>
+                {{ form.email }}
+                <label>Enter Password</label>
+                <span class="text-danger">{{ form.password1.errors }}</span>
+                {{ form.password1 }}
+                <label>Confirm Password</label>
+                <span class="text-danger">{{ form.password2.errors }}</span>
+                {{ form.password2 }}
+                <button type="submit" name="button">Register</button>
+                <p class="message">Already have an account? <a href="{% url 'user_login' %}">Login</a></p>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

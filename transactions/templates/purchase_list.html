@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+{% load querystring from django_tables2 %}
+{% block title %}Purchases{% endblock title %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a class="btn btn-sm btn-success" href="{% url 'purchase_create' %}">Add Purchase Order</a>
+                <a class="btn btn-sm btn-outline-success" href="{% querystring '_export'='xlsx' %}">
+                    <i class="fa-solid fa-download"></i> Export to Excel
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Delivery status</th>
+                            <th>Delivery date</th>
+                            <th>Vendor</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for purchase in purchases %}
+                        <tr>
+                            <th scope="row">{{ purchase.id }}</th>
+                            <td>{{ purchase.item.name }}</td>
+                            <td>{{ purchase.quantity }}</td>
+                            <td>{{ purchase.total_value }}</td>
+                            <td>
+                                {% if purchase.delivery_status == 'P' %}
+                                <span class="badge bg-danger text-white">Pending</span>
+                                {% else %}
+                                <span class="badge bg-success text-white">Successful</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ purchase.delivery_date|date:"Y/m/d" }}</td>
+                            <td>{{ purchase.vendor.name }}</td>
+                            <td>
+                                <a href="{% url 'purchase_update' purchase.id %}" class="btn btn-info btn-sm me-2">Edit</a>
+                                <a href="{% url 'purchase_delete' purchase.id %}" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
