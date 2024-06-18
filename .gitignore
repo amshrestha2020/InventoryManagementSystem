@@ -37,6 +37,8 @@ __pycache__/
 *.egg
 *.py[co]
 *.so
+__pycache__/
+*.py[cod]
 
 # Ignore Java specific files
 *.class
@@ -79,3 +81,9 @@ build/
 .Trashes
 ehthumbs.db
 Desktop.ini
+
+
+
+venv/
+env/
+.env/
