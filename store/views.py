@@ -110,6 +110,13 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     template_name = 'products_create.html'
     form_class = ProductForm
     
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Product has been successfully created.")
+        return response
+
+
     def get_success_url(self):
         return reverse('products_list')
 
@@ -125,7 +132,13 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     template_name = 'products_update.html'
     fields = ['name','category','quantity','selling_price', 'expiring_date', 'vendor']
     
-    
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Product has been successfully updated.")
+        return response
+
+
     def get_success_url(self):
         return reverse('products_list')
 
@@ -139,6 +152,11 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Item
     template_name = 'products_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, "Product has been successfully deleted.")
+        return response
     
     def get_success_url(self):
         return reverse('products_list')
@@ -197,6 +215,12 @@ class DeliveryCreateView(LoginRequiredMixin, CreateView):
     fields = ['item', 'customer_name', 'phone_number', 'location', 'date','is_delivered']
     template_name = 'delivery_create.html'
 
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Delivery Data has been successfully created.")
+        return response
+
     def get_success_url(self):
         return reverse('deliveries')
     
@@ -215,6 +239,12 @@ class DeliveryUpdateView(LoginRequiredMixin, UpdateView):
     fields = ['item', 'customer_name', 'phone_number', 'location', 'date','is_delivered']
     template_name = 'delivery_update.html'
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Delivery Data has been successfully updated.")
+        return response
+
+
     def get_success_url(self):
         return reverse('deliveries')
     
@@ -231,6 +261,12 @@ class DeliveryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Delivery
     template_name = 'products_delete.html'
 
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, "Delivery Data has been successfully deleted.")
+        return response
+    
     def get_success_url(self):
         return reverse('deliveries')
     

@@ -16,6 +16,7 @@ from django.views.generic import (
 )
 from invoice.models import Invoice
 from .tables import InvoiceTable
+from django.contrib import messages
 
 
 
@@ -43,6 +44,11 @@ class InvoiceCreateView(LoginRequiredMixin,CreateView):
     template_name = 'invoice_create.html'
     fields = ['customer_name','contact_number','item','price_per_item','quantity', 'shipping',]
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Invoice has been successfully created.")
+        return response
+    
     def get_success_url(self):
         return reverse('invoice_list')
 
@@ -50,6 +56,12 @@ class InvoiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Invoice
     template_name = 'invoice_update.html'
     fields = ['customer_name','contact_number','item','price_per_item','quantity','shipping',]
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Invoice has been successfully updated.")
+        return response
+
 
     def get_success_url(self):
         return reverse('invoice_list')
@@ -66,6 +78,11 @@ class InvoiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = 'invoice_delete.html'
     success_url = '/products'
 
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, "Invoice has been successfully deleted.")
+        return response
+    
     def get_success_url(self):
         return reverse('invoice_list')
 

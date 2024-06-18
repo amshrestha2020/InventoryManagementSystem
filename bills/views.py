@@ -15,6 +15,7 @@ from django_tables2.export.views import ExportMixin
 from bills.models import Bill
 from bills.tables import BillTable
 from accounts.models import Profile
+from django.contrib import messages
 
 
 
@@ -33,8 +34,14 @@ class BillCreateView(LoginRequiredMixin, CreateView):
     model = Bill
     template_name = 'bill_create.html'
     fields = ['institution_name', 'phone_number', 'email', 'address', 'description', 'payment_details', 'amount', 'status']
-    success_url = 'bills/'
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Bill has been successfully created.")
+        return response
+    
+    def get_success_url(self):
+        return reverse('bill_list')
 
 class BillUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View for updating a bill."""
@@ -45,6 +52,12 @@ class BillUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         """Checks if the user has the required permissions to access this view."""
         return self.request.user.profile in Profile.objects.all()
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Bill has been successfully updated.")
+        return response
+
 
     def get_success_url(self):
         return reverse('bill_list')
@@ -59,5 +72,10 @@ class BillDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         """Checks if the user has the required permissions to access this view."""
         return self.request.user.is_superuser
 
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, "Bill has been successfully deleted.")
+        return response
+    
     def get_success_url(self):
         return reverse('bill_list')

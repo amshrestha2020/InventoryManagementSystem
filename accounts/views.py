@@ -48,6 +48,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.views import LogoutView
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.contrib import messages
 
 
 class LoginView(RedirectURLMixin, FormView):
@@ -175,7 +176,9 @@ class ProfileCreateView(LoginRequiredMixin, CreateView):
     fields = ['user','role', 'status']
 
     def form_valid(self, form):
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        messages.success(self.request, "User Profile has been successfully created.")
+        return response
 
     def test_func(self):
         if self.request.user.is_superuser:
@@ -192,8 +195,10 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     fields = ['user','role', 'status']
 
     def form_valid(self, form):
-        return super().form_valid(form)
-
+        response = super().form_valid(form)
+        messages.success(self.request, "User Profile has been successfully updated.")
+        return response
+    
     def test_func(self):
         if self.request.user.is_superuser:
             return True
@@ -212,5 +217,11 @@ class ProfileDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         else:
             return False
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, "User Profile has been successfully deleted.")
+        return response
+    
     def get_success_url(self):
         return reverse('profile_list')

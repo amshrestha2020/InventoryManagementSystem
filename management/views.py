@@ -30,6 +30,11 @@ class VendorCreateView(CreateView):
     fields = ['name', 'photo', 'address', 'mobile', 'status']
 
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Vendor has been successfully created.")
+        return response
+    
     def get_success_url(self):
         return reverse('sales_list')
 
@@ -39,6 +44,7 @@ def vendor_edit(request, pk):
         form = VendorForm(request.POST, instance=vendor)
         if form.is_valid():
             vendor = form.save()
+            messages.success(request, "Vendor has been successfully updated.")
             return redirect('vendor')
     else:
         form = VendorForm(instance=vendor)
@@ -49,6 +55,7 @@ def vendor_delete(request, pk):
     vendor = get_object_or_404(Vendor, pk=pk)
     if request.method == "POST":
         vendor.delete()
+        messages.success(request, "Vendor has been successfully deleted.")
         return redirect('vendor')
     return render(request, 'vendor_delete.html', {'vendor': vendor})
 
@@ -64,6 +71,7 @@ def customer_edit(request, pk):
         form = CustomerForm(request.POST, instance=customer)
         if form.is_valid():
             customer = form.save()
+            messages.success(request, "Customer has been successfully eduted.")
             return redirect('customer_list')
     else:
         form = CustomerForm(instance=customer)
@@ -74,6 +82,7 @@ def customer_delete(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     if request.method == "POST":
         customer.delete()
+        messages.success(request, "Customer has been successfully deleted.")
         return redirect('customer_list')
     return render(request, 'customer_confirm_delete.html', {'customer': customer})
 
@@ -93,8 +102,10 @@ class ItemSearchListView(CustomerListView):
                        (Q(name__icontains=q) for q in query_list))
             )
 
-                # If no items are found, add a message
-        if not result.exists():
-            messages.add_message(self.request, messages.INFO, 'Match Not found')
-
         return result
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if not context['object_list']:
+            messages.info(self.request, 'Match not found')
+        return context

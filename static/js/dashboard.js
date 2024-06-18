@@ -23,10 +23,12 @@ const showAsideBtn = $('.show-side-btn')
 const sidebar = $('.sidebar')
 const wrapper = $('#wrapper')
 
-showAsideBtn.addEventListener('click', function () {
-  $(`#${this.dataset.show}`).classList.toggle('show-sidebar')
-  wrapper.classList.toggle('fullwidth')
-})
+if(showAsideBtn) {
+  showAsideBtn.addEventListener('click', function () {
+    $(`#${this.dataset.show}`).classList.toggle('show-sidebar')
+    wrapper.classList.toggle('fullwidth')
+  })
+}
 
 if (window.innerWidth < 767) {
   sidebar.classList.add('show-sidebar');

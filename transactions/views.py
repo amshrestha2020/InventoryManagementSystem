@@ -23,6 +23,7 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
+from django.contrib import messages
 
 class PurchaseListView(ExportMixin, tables.SingleTableView):
     """View to list purchases and export them."""
@@ -64,7 +65,9 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
         item.quantity += quantity
         item.save()
 
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        messages.success(self.request, "Purchase Data has been successfully created.")
+        return response
 
     def get_success_url(self):
         return reverse('purchase_list')
@@ -89,6 +92,12 @@ class PurchaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         else:
             return False
     
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Purchase Data has been successfully updated.")
+        return response
+
     def get_success_url(self):
             return reverse('purchase_list')
 
@@ -104,6 +113,12 @@ class PurchaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         else:
             return False
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, "Purchase Data has been successfully deleted.")
+        return response
+    
     def get_success_url(self):
             return reverse('purchase_list')
 
@@ -151,7 +166,9 @@ class SaleCreateView(LoginRequiredMixin, CreateView):
         form.instance.balance = balance
 
         form.instance.profile = self.request.user.profile
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        messages.success(self.request, "Sales has been successfully created.")
+        return response
 
     def test_func(self):
         profile_list = Profile.objects.all()
@@ -180,13 +197,21 @@ class SaleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         """Handles form submission and sets the profile of the sale."""
         form.instance.profile = self.request.user.profile
-        return super().form_valid(form)
-
+        response = super().form_valid(form)
+        messages.success(self.request, "Sales has been successfully updated.")
+        return response
+    
 class SaleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """View to delete a sale."""
     model = Sale
     template_name = 'sales_delete.html'
 
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(self.request, "Sales has been successfully deleted.")
+        return response
+    
     def get_success_url(self):
         return reverse('sales_list')
 

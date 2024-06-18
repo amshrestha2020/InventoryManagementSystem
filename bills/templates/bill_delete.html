@@ -2,7 +2,7 @@
 {% block title %}Confirm delete{% endblock %}
 {% block content %}
 <div class="container pt-5">
-    <form action="{% url "bill_delete" object.slug %}" method="POST">
+    <form action="{% url "bill_delete" bill.id %}" method="POST">
         {% csrf_token %}
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">Delete Item</legend>
