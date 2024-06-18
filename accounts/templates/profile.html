@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Staff Page{% endblock %}
+
+{% block content %}
+
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="row g-0">
+            <div class="col-md-8 p-4">
+                <h4 class="mb-3">Profile Information</h4>
+                <a class="btn btn-outline-success btn-sm float-end mb-3" href="{% url 'user_profile_update' %}">Edit profile</a>
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Username</th>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Staff Role</th>
+                            <td>
+                                <span class="badge bg-success text-white">
+                                    {% if user.profile.role == 'AD' %}
+                                    Admin
+                                    {% elif user.profile.role == 'EX' %}
+                                    Executive
+                                    {% else %}
+                                    Operative
+                                    {% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">First Name</th>
+                            <td>{{ user.profile.first_name }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Last Name</th>
+                            <td>{{ user.profile.last_name }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email</th>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone</th>
+                            <td>{{ user.profile.telephone }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-center p-4">
+                <img class="rounded-circle img-fluid" src="{{ user.profile.profile_picture.url }}" alt="profile-image" style="max-width: 200px;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

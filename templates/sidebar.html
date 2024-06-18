@@ -1,0 +1,83 @@
+{% load static %}
+<style>
+  .btn-logout {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      border-radius: 0.25rem;
+      transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  .btn-logout:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+  }
+
+  .btn-logout, .btn-logout i, .btn-logout:hover, .btn-logout:hover i {
+    color: #fff; /* This will make the text and icon color white */
+}
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+<aside class="sidebar position-fixed top-0 left-0 overflow-auto h-100 float-left" id="show-side-navigation1">
+    <i class="fa fa-bars close-aside d-md-none d-lg-none" data-close="show-side-navigation1"></i>
+    <div class="sidebar-header d-flex justify-content-center align-items-center px-3 py-4">
+      <a href="{% url 'user_profile' %}">
+        <img
+          class="rounded-pill img-fluid"
+          id = "sidebar-img"
+          width="65"
+          src="{{request.user.profile.profile_picture.url}}"
+          alt="">
+        </a>
+        <div class="ms-2">
+          <h5 class="fs-6 mb-0 text-white">{{user.username}}{% if user.profile.role == 'AD' %} <i class="fa-solid fa-circle-check"></i>{% endif %}</h5>
+          <span class="badge badge-pill bg-soft-success text-success me-2">
+            {% if user.profile.role == 'AD' %}
+              Admin
+            {% elif user.profile.role == 'EX' %}
+              Executive
+            {% else %}
+              Operative
+        {% endif %}
+          </span>
+        </div>
+    </div>
+    <ul class="categories list-unstyled">
+      <li>
+        <i class="fa fa-home fa-fw"></i><a href="{% url 'dashboard' %}"> Dashboard</a>
+      </li>
+      <li class="">
+        <i class="fa fa-folder"></i><a href="{% url "products_list" %}"> Products</a>
+      </li>
+      <li>
+        <i  class="fa fa-shopping-bag fa-fw"></i><a href="{% url 'sales_list' %}"> Sales Orders</a>
+      </li>
+      <li>
+        <i class="fa fa-shopping-cart"></i><a href="{% url "purchase_list"%}"> Purchase Orders</a>
+      </li>
+      <li>
+        <i class="fas fa-box"></i><a href="{% url "deliveries" %}"> Package</a>
+      </li>
+      <li>
+        <i class="fas fa-receipt"></i><a href="{% url "invoice_list" %}"> Invoices</a>
+      </li>
+      <li>
+        <i class="fas fa-money-bill-wave"></i><a href="{% url "bill_list" %}"> Bills</a>
+      </li>
+      <li>
+        <i class="fas fa-truck"></i><a href="{% url 'vendor' %}"> Vendors</a>
+      </li>
+      <li>
+        <i class="fas fa-users"></i><a href="{% url 'customer_list' %}"> Customers</a>
+      </li>
+      <li>
+        <i class="fas fa-users"></i><a href="{% url "profile_list" %}"> Staff</a>
+      </li>
+      <li class="">
+        <a class="btn btn-outline-danger" href="{% url "user_logout" %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>

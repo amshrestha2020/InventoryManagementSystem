@@ -1,0 +1,150 @@
+{% extends "base.html" %} 
+{% load static %}
+{% block title %}Transaction detail{% endblock %}
+{% block content %}
+
+
+
+<style>
+    .receipt {
+        margin: 0 auto;
+        font-size: 12px;
+        position: relative;
+        font-family: 'courier';
+        max-width: 400px;
+    }
+    .serif {
+        font-family: serif;
+    }
+    .sans-serif {
+        font-family: 'sans-serif';
+    }
+    .bold {
+        font-weight: 700;
+    }
+    .x-bold {
+        font-weight: 900;
+        text-shadow: 0px 0px 1px #000;
+    }
+    .hr, .hr-sm, .hr-lg {
+        border-bottom: 1.5px dashed #333;
+        margin: 10px 0;
+    }
+    .hr-sm {
+        width: 30%;
+        float: right;
+    }
+    .hr-lg {
+        width: 100%;
+    }
+    .col2 {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .container-ticket {
+        background: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 50px 0;
+    }
+    .ticket {
+        background: #fff;
+        padding: 20px;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, .1);
+        border-radius: 10px;
+    }
+    .head-ticket p {
+        font-size: 14px;
+    }
+    .head-ticket p:nth-child(1) {
+        font-size: 18px;
+    }
+    .code-barre span {
+        height: 100%;
+        width: 2px;
+        display: inline-block;
+        background: #333;
+        margin-right: 1px;
+    }
+    .body-ticket .produits {
+        margin: 20px 0;
+    }
+    .body-ticket .carte {
+        text-align: center;
+    }
+    .body-ticket .carte .title-carte {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -1px;
+    }
+    .footer-ticket .title-footer {
+        font-size: 16px;
+        font-weight: 900;
+        text-shadow: 0px 1px 0px rgba(0, 0, 0, .5);
+        text-align: center;
+        letter-spacing: 2px;
+    }
+</style>
+<div class="container-ticket">
+    <div class="ticket">
+        <div class="text-center mt-3">
+            <a class="btn btn-outline-success btn-sm"><i class="fa fa-print"></i> Print</a>
+        </div>
+        <div class="head-ticket text-center">
+            <p class="x-bold">InventoryMS</p>
+            <p class="bold">Tom Mboya Street, Tudor</p>
+            <p class="bold">Tel: 0746341598</p>
+            <p class="bold">P.O BOX. 90420-80100 MSA</p>
+            <p>Date: {{ sale.transaction_date|date:"Y/m/d H:i:s" }}</p>
+            <p>Receipt code: IMS{{ sale.id }}{{ sale.slug|upper }}</p>
+            <div class="code-barre">
+                {% for i in "1234567890" %}
+                    <span></span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="body-ticket">
+            <div class="produits">
+                <div class="col2">
+                    <p>{{ sale.item.name|upper }}</p>
+                    <p class="prix"><b>Ksh {{ sale.price }}</b></p>
+                </div>
+                <div class="hr-sm"></div>
+                <div class="col2">
+                    <p>Quantity</p>
+                    <p class="prix"><b>{{ sale.quantity }}</b></p>
+                </div>
+                <div class="col2">
+                    <p>Total</p>
+                    <p class="prix"><b>{{ sale.total_value }}<b></p>
+                </div>
+                <br>
+                <div class="col2">
+                    <p>Payment Method</p>
+                    <p class="prix"><b>{{ sale.payment_method }}<b></p>
+                </div>
+                <div class="col2">
+                    <p>Amount received</p>
+                    <p class="prix"><b>Ksh {{ sale.amount_received }}</b></p>
+                </div>
+                <div class="col2">
+                    <p>Balance</p>
+                    <p class="prix"><b>{{ sale.balance }}</b></p>
+                </div>
+            </div>
+            <div class="hr-lg"></div>
+            <div class="carte">
+                <p class="title-carte">Customer: {{ sale.customer_name }}</p>
+                <p>Served by: {{ sale.profile }}</p>
+            </div>
+            <div class="hr-lg"></div>
+        </div>
+        <div class="footer-ticket">
+            <p class="title-footer">THANK YOU</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
