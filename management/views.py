@@ -109,3 +109,9 @@ class ItemSearchListView(CustomerListView):
         if not context['object_list']:
             messages.info(self.request, 'Match not found')
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if not context['object_list']:
+            return redirect('customer_list')  # replace 'customer_list' with the name of your customer list view
+        else:
+            return super().render_to_response(context, **response_kwargs)

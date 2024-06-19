@@ -20,8 +20,9 @@
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>Quantity</th>
                             <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total Amount</th>
                             <th>Delivery status</th>
                             <th>Delivery date</th>
                             <th>Vendor</th>
@@ -29,7 +30,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for purchase in purchases %}
+                        {% comment %} {% for purchase in purchases %}
                         <tr>
                             <th scope="row">{{ purchase.id }}</th>
                             <td>{{ purchase.item.name }}</td>
@@ -49,7 +50,41 @@
                                 <a href="{% url 'purchase_delete' purchase.id %}" class="btn btn-danger btn-sm">Delete</a>
                             </td>
                         </tr>
-                        {% endfor %}
+                        {% endfor %} {% endcomment %}
+
+
+                        {% for purchase in purchases %}
+                            <tr>
+                                <td>
+                                    <a href="store/products/{{ purchase.id }}/{{ purchase.name }}">
+                                        {% if purchase.item.image_id > 0 %}
+                                            <img src="{{ purchase.item.image }}" alt="" style="height: 80px">
+                                        {% else %}
+                                            <img src="{{ purchase.item.image.url }}" alt="" style="height: 80px">
+                                        {% endif %}
+                                    </a>
+                                </td>
+                                <td>{{ purchase.item.name }} {{ purchase.quantity }}   {{ purchase.total_value }}</td>
+                                <td>{{ purchase.price }}</td> <!-- Assuming this is the price per item -->
+                                <td>{{ purchase.quantity }}</td>
+                                <td>{{ purchase.total_value }}</td>
+                                <td>
+                                    {% if purchase.delivery_status == 'P' %}
+                                        <span class="badge bg-danger text-white">Pending</span>
+                                    {% else %}
+                                        <span class="badge bg-success text-white">Successful</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ purchase.delivery_date|date:"Y/m/d" }}</td>
+                                <td>{{ purchase.vendor.name }}</td>
+                                <td>
+                                    <a class="primary-btn" href="/user/order_product_detail/{{ purchase.id }}"> Detail </a>
+                                    <a href="{% url 'purchase_update' purchase.id %}" class="btn btn-info btn-sm me-2">Edit</a>
+                                    <a href="{% url 'purchase_delete' purchase.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
                     </tbody>
                 </table>
             </div>
