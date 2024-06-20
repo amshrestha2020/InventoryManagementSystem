@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'mptt',
     'currencies',
 
-    # app
+    # backend_app
     'management',
     'accounts',
     'transactions',
@@ -61,12 +61,17 @@ INSTALLED_APPS = [
     'bills',
     'invoice',
 
+    # frontend_app
+    'homepage',
+
+
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -146,9 +151,9 @@ USE_I18N = True
 USE_TZ = True
 
 
-LOGIN_URL = 'user_login'
-LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_URL = 'user_logout'
+# LOGIN_URL = 'user_login'
+# LOGIN_REDIRECT_URL = 'dashboard'
+# LOGOUT_URL = 'user_logout'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -172,6 +177,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
+SITE_ID = 1
 
 # settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
