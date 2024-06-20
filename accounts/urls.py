@@ -11,6 +11,7 @@ from .views import (
     ProfileUpdateView,
     ProfileDeleteView,
     CustomLogoutView,
+    AddCommentView,
 )
 urlpatterns = [
     path('activate/<uidb64>/<token>/', views.activate, name='activate'),
@@ -22,6 +23,10 @@ urlpatterns = [
     path('profiles/',ProfileListView.as_view(), name="profile_list"),
     path('new-profile/', ProfileCreateView.as_view(), name='profile_create'),
     path('profile/<int:pk>/update/', ProfileUpdateView.as_view(), name='profile_update'),
-    path('profile/<int:pk>/update/', ProfileDeleteView.as_view(), name='profile_delete')
+    path('profile/<int:pk>/update/', ProfileDeleteView.as_view(), name='profile_delete'),
+
+
+    path('addcomment/<int:id>', AddCommentView.as_view(), name='addcomment'),
+
 ]
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
