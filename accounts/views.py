@@ -104,40 +104,63 @@ def activate(request, uidb64, token):
 #     return render(request, 'register.html', context)
 
 
+# def register(request):
+#     if request.method == 'POST':
+#         form = CreateUserForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.is_active = False  # Deactivate account till it is confirmed
+#             user.save()
+
+#             # Send registration confirmation mail
+#             current_site = get_current_site(request)
+#             mail_subject = 'Activate your account.'
+#             message = render_to_string('acc_active_email.html', {
+#                 'user': user,
+#                 'domain': current_site.domain,
+#                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+#                 'token': account_activation_token.make_token(user),
+#             })
+#             to_email = form.cleaned_data.get('email')
+
+#             # Debugging prints
+#             print(f"Email Subject: {mail_subject}")
+#             print(f"Email Message: {message}")
+#             print(f"To Email: {to_email}")
+#             print(f"EMAIL_HOST: {settings.EMAIL_HOST}")
+#             print(f"EMAIL_PORT: {settings.EMAIL_PORT}")
+#             print(f"EMAIL_USE_TLS: {settings.EMAIL_USE_TLS}")
+
+
+#             send_mail(mail_subject, message, 'your-email@example.com', [to_email])
+#             return render(request, 'verification_sent.html')
+#     else:
+#         form = CreateUserForm()
+#     return render(request, 'register.html', {'form': form})
+
+
+
 def register(request):
     if request.method == 'POST':
-        form = CreateUserForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False  # Deactivate account till it is confirmed
-            user.save()
-
-            # Send registration confirmation mail
-            current_site = get_current_site(request)
-            mail_subject = 'Activate your account.'
-            message = render_to_string('acc_active_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': account_activation_token.make_token(user),
-            })
-            to_email = form.cleaned_data.get('email')
-
-            # Debugging prints
-            print(f"Email Subject: {mail_subject}")
-            print(f"Email Message: {message}")
-            print(f"To Email: {to_email}")
-            print(f"EMAIL_HOST: {settings.EMAIL_HOST}")
-            print(f"EMAIL_PORT: {settings.EMAIL_PORT}")
-            print(f"EMAIL_USE_TLS: {settings.EMAIL_USE_TLS}")
-
-
-            send_mail(mail_subject, message, 'your-email@example.com', [to_email])
-            return render(request, 'verification_sent.html')
+        if request.POST['password1'] == request.POST['password2']:
+            username_exists = User.objects.filter(username=request.POST['username']).exists()
+            email_exists = User.objects.filter(email=request.POST['email']).exists()
+            if username_exists or email_exists:
+                return render(request, 'register.html', {'error':'username and/or email has already been taken'})
+            else:
+                user = User.objects.create_user(request.POST['username'], 
+                                                password=request.POST['password1'], 
+                                                email=request.POST['email'], 
+                                                first_name=request.POST['first_name'], 
+                                                last_name=request.POST['last_name'])
+                login(request, user)
+                return redirect('index')
+        else:
+            return render(request, 'register.html', {'error':'passwords should match'})
     else:
-        form = CreateUserForm()
-    return render(request, 'register.html', {'form': form})
+        return render(request, 'register.html')
 
+     
 
 def profile(request):
     context = {
@@ -175,8 +198,8 @@ class ProfileListView(LoginRequiredMixin, ExportMixin, tables.SingleTableView):
 
 class ProfileCreateView(LoginRequiredMixin, CreateView):
     model = Profile
-    template_name = 'staffcreate'
-    fields = ['user','role', 'status']
+    template_name = 'staff_create.html'
+    fields = ['user','role', 'status', 'profile_picture', 'telephone', 'email', 'first_name', 'last_name', 'address', 'city', 'country']
 
     def form_valid(self, form):
         response = super().form_valid(form)

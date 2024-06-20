@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import dashboard, VendorListView, vendor_edit, vendor_delete, CustomerListView, customer_edit, customer_delete, ItemSearchListView, VendorCreateView
+from .views import DashboardView, VendorListView, vendor_edit, vendor_delete, CustomerListView, customer_edit, customer_delete, ItemSearchListView, VendorCreateView
 
 urlpatterns = [
-    path('dashboard/', dashboard, name='dashboard'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('vendor/', VendorListView.as_view(), name='vendor'),
     path('vendors/', VendorCreateView.as_view(), name='vendor_create'),
     path('vendor/<int:pk>/edit/', vendor_edit, name='vendor_edit'),

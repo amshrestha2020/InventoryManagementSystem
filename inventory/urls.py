@@ -17,17 +17,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
+from management.views import HomeRedirectView, DashboardView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('management.urls')),
+    path('management/', include('management.urls')),
     path('accounts/', include('accounts.urls')),
     path('store/', include('store.urls')),
     path('transactions/', include('transactions.urls')),
     path('bills/', include('bills.urls')),
     path('invoice/', include('invoice.urls')),
-    path('', auth_views.LoginView.as_view(template_name='login.html'), name='user_login'),
+    # path('', auth_views.LoginView.as_view(template_name='login.html'), name='user_login'),
 
+    path('', HomeRedirectView.as_view(), name='home_redirect'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
 
 
 ]

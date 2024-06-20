@@ -7,14 +7,29 @@ from django.db.models import Q, Count, Sum, Avg
 import operator
 from django.contrib import messages
 from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
 
 # Create your views here.
 
-def dashboard(request):
-    if not request.user.is_authenticated:
-        return redirect('user_login')
-    return render(request, 'templates/dashboard.html')
+# def dashboard(request):
+#     if not request.user.is_authenticated:
+#         return redirect('user_login')
+#     return render(request, 'templates/dashboard.html')
 
+
+class HomeRedirectView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_staff:  # Assuming admin users have 'is_staff' set to True
+            return redirect('dashboard')
+        else:
+            return redirect('index')
+
+class DashboardView(LoginRequiredMixin, View):
+    template_name = 'templates/dashboard.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
 
 # vendor_list
 

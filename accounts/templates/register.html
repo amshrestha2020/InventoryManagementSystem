@@ -102,17 +102,29 @@
             <form class="login-form" method="POST">
                 {% csrf_token %}
                 <p>{{ message }}</p>
+                <label>First Name</label>
+                <span class="text-danger">{{ form.first_name.errors }}</span>
+                <input type="first_name" name="first_name" required>
+                {{ form.first_name }}
+                <label>Last Name</label>
+                <span class="text-danger">{{ form.last_name.errors }}</span>
+                <input type="last_name" name="last_name" required>
+                {{ form.last_name }}
                 <label>Username</label>
                 <span class="text-danger">{{ form.username.errors }}</span>
+                <input type="username" name="username" required>
                 {{ form.username }}
                 <label>Email</label>
                 <span class="text-danger">{{ form.email.errors }}</span>
+                <input type="email" name="email" required>
                 {{ form.email }}
                 <label>Enter Password</label>
                 <span class="text-danger">{{ form.password1.errors }}</span>
+                <input type="password" name="password1" required>
                 {{ form.password1 }}
                 <label>Confirm Password</label>
                 <span class="text-danger">{{ form.password2.errors }}</span>
+                <input type="password" name="password2" required>
                 {{ form.password2 }}
                 <button type="submit" name="button">Register</button>
                 <p class="message">Already have an account? <a href="{% url 'user_login' %}">Login</a></p>
