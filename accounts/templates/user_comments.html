@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% load render_table from django_tables2 %}
+{% load querystring from django_tables2 %}
+{% block title %}User Order List{% endblock title %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="title">User Order List</h4>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Rate</th>
+                            <th>Subject</th>
+                            <th>Comment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rs in comments %}
+                        <tr>
+                            <td>
+                                <a href="/product/{{ rs.product_id }}/{{ rs.product.slug }}">
+                                    <strong>{{ rs.product.title }}</strong>
+                                </a>
+                            </td>
+                            <td>{{ rs.rate }}</td>
+                            <td>{{ rs.subject }}</td>
+                            <td>{{ rs.comment }}</td>
+                            <td>{{ rs.status }}</td>
+                            <td>{{ rs.create_at|date:"Y/m/d - H:i:s" }}</td>
+                            <td>
+                                <a class="btn btn-danger btn-sm" href="/user/deletecomment/{{ rs.id }}" onclick="return confirm('Will be Delete! Are you sure?')">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

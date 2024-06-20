@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from django.utils.translation import gettext_lazy as _
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,6 +49,9 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_filters',
     'django_tables2',
+    'ckeditor',
+    'mptt',
+    'currencies',
 
     # app
     'management',
@@ -123,6 +128,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
+LANGUAGES = [
+    ('en', _('English')),
+    ('tr', _('Turkish')),
+    ('sp', _('Spanish')),
+    ('jp', _('Japanese')),
+]
+
+DEFAULT_CURRENCY = 'USD'
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -167,3 +181,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'youremail@gmail.com'
 EMAIL_HOST_PASSWORD = 'fikjvgjtkreahfzs'
 
+
+
+####################################
+##  CKEDITOR CONFIGURATION ##
+####################################
+CKEDITOR_UPLOAD_PATH = 'images/'
+CKEDITOR_IMAGE_BACKEND = "pillow"
