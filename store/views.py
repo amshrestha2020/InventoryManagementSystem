@@ -190,27 +190,11 @@ class DeliverySearchListView(DeliveryListView):
         return result
 
 class DeliveryDetailView(LoginRequiredMixin, DetailView):
-    """
-    View class to display detailed information about a delivery.
-
-    Attributes:
-    - model: The model associated with the view.
-    - template_name: The HTML template used for rendering the view.
-    """
     model = Delivery
     template_name = 'delivery_detail.html'
 
 
 class DeliveryCreateView(LoginRequiredMixin, CreateView):
-    """
-    View class to create a new delivery.
-
-    Attributes:
-    - model: The model associated with the view.
-    - fields: The fields to be included in the form.
-    - template_name: The HTML template used for rendering the view.
-    - success_url: The URL to redirect to upon successful form submission.
-    """
     model = Delivery
     fields = ['item', 'customer_name', 'phone_number', 'location', 'date','is_delivered']
     template_name = 'delivery_create.html'
@@ -226,15 +210,6 @@ class DeliveryCreateView(LoginRequiredMixin, CreateView):
     
 
 class DeliveryUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    View class to update delivery information.
-
-    Attributes:
-    - model: The model associated with the view.
-    - fields: The fields to be updated.
-    - template_name: The HTML template used for rendering the view.
-    - success_url: The URL to redirect to upon successful form submission.
-    """
     model = Delivery
     fields = ['item', 'customer_name', 'phone_number', 'location', 'date','is_delivered']
     template_name = 'delivery_update.html'
@@ -250,14 +225,6 @@ class DeliveryUpdateView(LoginRequiredMixin, UpdateView):
     
 
 class DeliveryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """
-    View class to delete a delivery.
-
-    Attributes:
-    - model: The model associated with the view.
-    - template_name: The HTML template used for rendering the view.
-    - success_url: The URL to redirect to upon successful deletion.
-    """
     model = Delivery
     template_name = 'products_delete.html'
 

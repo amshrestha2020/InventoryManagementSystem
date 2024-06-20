@@ -49,6 +49,9 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.contrib import messages
 from store.models import Comment
+from django.utils.decorators import method_decorator
+from django.views import View
+from store.forms import CommentForm
 
 
 class LoginView(RedirectURLMixin, FormView):
@@ -255,3 +258,33 @@ class UserCommentDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView)
         else:
             messages.error(self.request, "You do not have permission to delete this comment.")
             return redirect('user_comments')
+        
+
+
+
+class AddCommentView(View):
+    def post(self, request, id):
+        url = request.META.get('HTTP_REFERER')  # get last url
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            data = Comment()  # create relation with model
+            data.subject = form.cleaned_data['subject']
+            data.comment = form.cleaned_data['comment']
+            data.rate = form.cleaned_data['rate']
+            data.ip = request.META.get('REMOTE_ADDR')
+            data.product_id = id
+            current_user = request.user
+            data.user_id = current_user.id
+            data.save()  # save data to table
+            messages.success(request, "Your review has been sent. Thank you for your interest.")
+        else:
+            messages.error(request, "There was an error in your form submission.")
+        return HttpResponseRedirect(url)
+
+    def get(self, request, id):
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+@method_decorator(login_required(login_url='/login'), name='dispatch')
+class ColorsView(View):
+    def get(self, request):
+        return render(request, 'product_color.html')
