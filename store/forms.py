@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from store.models import Item
+from store.models import Item, Comment
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -13,3 +13,11 @@ class ProductForm(forms.ModelForm):
                 'placeholder': 'mm/dd/yyyy'
                 }),
         }
+
+
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['subject', 'comment', 'rate']

@@ -13,6 +13,8 @@ import django_tables2 as tables
 from django_tables2.export.views import ExportMixin
 from django_tables2.export.export import TableExport
 from accounts.tables import ProfileTable
+from django.contrib.messages.views import SuccessMessageMixin
+
 
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -21,13 +23,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
 from .tokens import account_activation_token
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
 
 from django.views.generic import (
     ListView,
@@ -49,6 +48,7 @@ from django.contrib.auth.views import LogoutView
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.contrib import messages
+from store.models import Comment
 
 
 class LoginView(RedirectURLMixin, FormView):
@@ -225,3 +225,33 @@ class ProfileDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def get_success_url(self):
         return reverse('profile_list')
+    
+
+
+class UserCommentsListView(LoginRequiredMixin, ListView):
+    model = Comment
+    template_name = 'user_comments.html'
+    context_object_name = 'comments'
+
+    def get_queryset(self):
+        current_user = self.request.user
+        return Comment.objects.filter(user_id=current_user.id)
+
+class UserCommentDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = Comment
+    template_name = 'comment_confirm_delete.html'
+    success_url = reverse_lazy('user_comments')  # Redirect to the comments list after deletion
+    success_message = "Comment deleted successfully."
+
+    def get_queryset(self):
+        current_user = self.request.user
+        return Comment.objects.filter(user_id=current_user.id)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.user_id == request.user.id:
+            messages.success(self.request, self.success_message)
+            return super().delete(request, *args, **kwargs)
+        else:
+            messages.error(self.request, "You do not have permission to delete this comment.")
+            return redirect('user_comments')
