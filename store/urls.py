@@ -14,6 +14,7 @@ from .views import (
     DeliveryCreateView,
     DeliveryUpdateView,
     DeliveryDeleteView,
+
 )
 
 from accounts.views import ColorsView
@@ -33,7 +34,8 @@ urlpatterns = [
     path('delivery/<int:pk>/update/', DeliveryUpdateView.as_view(), name='delivery_update'),
     path('delivery/<int:pk>/delete/', DeliveryDeleteView.as_view(), name='delivery_delete'),
 
+    # homepage_userside
     path('colors/', ColorsView.as_view(), name='colors'),
-
 ]
+
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

@@ -8,7 +8,12 @@ from .views import ( SelectLanguageView,
                     FaqView, 
                     SelectCurrencyView, 
                     SaveLangCurView,
-                    IndexView )
+                    IndexView,
+                    ProductListView,
+                    SortedProductListView,
+                    UserSortedProductListView,
+                    UserProductListView, )
+
 
 urlpatterns = [
     path('selectlanguage/', SelectLanguageView.as_view(), name='selectlanguage'),
@@ -21,13 +26,10 @@ urlpatterns = [
     path('faq/', FaqView.as_view(), name='faq'),
     path('selectcurrency/', SelectCurrencyView.as_view(), name='selectcurrency'),
     path('savelangcur/', SaveLangCurView.as_view(), name='savelangcur'),
-    path('', IndexView.as_view(), name='index')
+    
+    path('products/', UserProductListView, name = 'productlist'),
+    path('products/', ProductListView.as_view(), name='product_list'),
+    path('sortedproducts/<str:keyword>/', SortedProductListView.as_view(), name='sorted_product_list'),
+    path('usersortedproducts/<str:keyword>/', UserSortedProductListView.as_view(), name='user_sorted_product_list'),
+
 ]
-
-
-# from django.urls import path
-# from .views import IndexView
-
-# urlpatterns = [
-#     path('', IndexView.as_view(), name='index'),
-# ]

@@ -26,6 +26,10 @@ from store.models import Category, Item, Delivery
 from store.forms import ProductForm
 from store.tables import ItemTable
 from django.contrib import messages
+from django.views.generic import ListView
+
+
+
 
 @login_required
 def dashboard(request):
@@ -243,3 +247,4 @@ class DeliveryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         else:
             return False
+        

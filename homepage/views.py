@@ -10,6 +10,7 @@ from django.views import View
 from django.views.generic.edit import FormView
 from django.contrib import messages
 from django.utils.translation import gettext as _
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 import json
 from .forms import SearchForm
@@ -21,6 +22,8 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.urls import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 
 class IndexView(TemplateView):
@@ -33,12 +36,10 @@ class IndexView(TemplateView):
         try:
             setting = Setting.objects.get(pk=1)
         except Setting.DoesNotExist:
-            # Handle case where Setting with pk=1 does not exist
-            setting = None  # Or provide a default Setting object
+            setting = None
 
-        products_latest = Item.objects.all().order_by('-id')[:4]  # last 4 products
+        products_latest = Item.objects.all().order_by('-id')[:4]
 
-        # >>>>>>>>>>>>>>>> M U L T I   L A N G U G A E >>>>>> START
         defaultlang = settings.LANGUAGE_CODE[0:2]
         currentlang = request.LANGUAGE_CODE[0:2]
 
@@ -51,8 +52,8 @@ class IndexView(TemplateView):
                 'ON p.id = l.product_id '
                 'WHERE l.lang=%s ORDER BY p.id DESC LIMIT 4', [currentlang])
 
-        products_slider = Item.objects.all().order_by('id')[:4]  # first 4 products
-        products_picked = Item.objects.all().order_by('?')[:4]   # Random selected 4 products
+        products_slider = Item.objects.all().order_by('id')[:4]
+        products_picked = Item.objects.all().order_by('?')[:4]
 
         page = "home"
         context = {
@@ -61,10 +62,23 @@ class IndexView(TemplateView):
             'products_slider': products_slider,
             'products_latest': products_latest,
             'products_picked': products_picked,
-            # 'category': category
         }
-        return self.render_to_response(context)
 
+        if request.user.is_authenticated:
+            if request.user.is_superuser:
+                return redirect('dashboard')
+            else:
+                return self.render_to_response(context)
+        else:
+            return self.render_to_response(context)
+
+class DashboardView(TemplateView):
+    template_name = 'dashboard.html'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return super().get(request, *args, **kwargs)
 
 
 class SelectLanguageView(View):
@@ -318,3 +332,74 @@ class SaveLangCurView(View):
         data.currency_id = request.session['currency']
         data.save()
         return HttpResponseRedirect(lasturl)
+    
+
+
+class ProductListView(View):
+    template_name = 'product_list.html'
+
+    def get(self, request):
+        items = Item.objects.all()
+        page = request.GET.get('page', 1)
+
+        paginator = Paginator(items, 9)
+        try:
+            items = paginator.page(page)
+        except PageNotAnInteger:
+            items = paginator.page(1)
+        except EmptyPage:
+            items = paginator.page(paginator.num_pages)
+
+        return render(request, self.template_name, {'product_list': items})
+
+    def post(self, request):
+        search_query = request.POST.get('search', '')
+        items = Item.objects.filter(name__icontains=search_query)
+
+        page = request.GET.get('page', 1)
+        paginator = Paginator(items, 1)
+        try:
+            items = paginator.page(page)
+        except PageNotAnInteger:
+            items = paginator.page(1)
+        except EmptyPage:
+            items = paginator.page(paginator.num_pages)
+
+        return render(request, self.template_name, {'product_list': items})
+
+
+
+class SortedProductListView(ListView):
+    template_name = 'product_list.html'
+    context_object_name = 'product_list'
+
+    def get_queryset(self):
+        keyword = self.kwargs['keyword']
+        if keyword == 'allclothes':
+            return Item.objects.filter(category__icontains='menclothes') | Item.objects.filter(category__icontains='menclothes womenclothes')
+        else:
+            return Item.objects.filter(category__iexact=str(keyword))
+        
+
+
+class UserSortedProductListView(ListView):
+    template_name = 'product_list.html'
+    context_object_name = 'product_list'
+
+    def get_queryset(self):
+        keyword = self.kwargs['keyword']
+        if keyword == 'allclothes':
+            return Item.objects.filter(category__icontains='menclothes') | Item.objects.filter(category__icontains='menclothes womenclothes')
+        else:
+            return Item.objects.filter(category__iexact=str(keyword))
+
+
+
+class UserProductListView(LoginRequiredMixin, ListView):
+    model = Item
+    template_name = 'user_products.html'
+    context_object_name = 'productlist'
+    login_url = 'login'  # URL to redirect to when the user is not logged in
+
+    def get_queryset(self):
+        return Item.objects.filter(created_by=self.request.user)
