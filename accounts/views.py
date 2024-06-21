@@ -57,7 +57,6 @@ from store.forms import CommentForm
 class LoginView(RedirectURLMixin, FormView):
     authentication_form = AuthenticationForm
     template_name = 'login.html'
-    success_url = reverse_lazy('dashboard')
     redirect_authenticated_user = True
 
     def form_valid(self, form):
@@ -65,6 +64,11 @@ class LoginView(RedirectURLMixin, FormView):
         login(self.request, form.get_user())
         return super().form_valid(form)
 
+    def get_success_url(self):
+        if self.request.user.is_staff:  # Assuming admin users have 'is_staff' set to True
+            return reverse_lazy('dashboard')
+        else:
+            return reverse_lazy('homepage:index')
 
 
 class CustomLogoutView(LogoutView):
@@ -89,19 +93,6 @@ def activate(request, uidb64, token):
     else:
         return render(request, 'activation_invalid.html')
     
-
-# def register(request):
-#     if request.method == 'POST':
-#         form = CreateUserForm(request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             return redirect('user_login')
-#     else:
-#         form = CreateUserForm()
-#     context = {
-#         'form': form
-#     }
-#     return render(request, 'register.html', context)
 
 
 # def register(request):
@@ -154,7 +145,7 @@ def register(request):
                                                 first_name=request.POST['first_name'], 
                                                 last_name=request.POST['last_name'])
                 login(request, user)
-                return redirect('index')
+                return redirect('home')
         else:
             return render(request, 'register.html', {'error':'passwords should match'})
     else:
