@@ -11,9 +11,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}eBazar | Home{% endblock %}</title>
 
-    <!-- stripe js -->
-    <script src="https://js.stripe.com/v3/"></script>
-
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;900&display=swap" rel="stylesheet">
@@ -34,7 +31,7 @@
     <div class="humberger__menu__overlay"></div>
     <div class="humberger__menu__wrapper">
         <div class="humberger__menu__logo">
-            <a href="{% url 'index' %}"><img src="/media/images/img/logo.png" alt="logo"></a>
+            <a href="{% url 'index' %}"><img src="/media/img/logo.png" alt="logo"></a>
         </div>
         <div class="humberger__menu__widget">
             <div class="header__top__right__language">
@@ -115,7 +112,7 @@
             <div class="row">
                 <div class="col-lg-3">
                     <div class="header__logo">
-                        <a href="{% url 'home' %}"><img src="/media/images/img/logo.png" alt=""></a>
+                        <a href="{% url 'home' %}"><img src="/media/img/logo.png" alt=""></a>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -165,24 +162,24 @@
                             <span>All departments</span>
                         </div>
                         <ul>
-                            <li><a href="">Electronics</a></li>
-                            <li><a href="">Men</a></li>
-                            <li><a href="">Women</a></li>
-                            <li><a href="">Household</a></li>
-                            <li><a href="">Books</a></li>
-                            <li><a href="">Fashion</a></li>
-                            <li><a href="">Beauty</a></li>
-                            <li><a href="">Software</a></li>
-                            <li><a href="">Groceries</a></li>
-                            <li><a href="">Shoes</a></li>
-                            <li><a href="">Kids</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'electronics' %}">Electronics</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'men clothes' %}">Men</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'women clothes' %}">Women</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'household' %}">Household</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'books' %}">Books</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'fashion' %}">Fashion</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'beauty' %}">Beauty</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'software' %}">Software</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'groceries' %}">Groceries</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'shoes' %}">Shoes</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'kids' %}">Kids</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-lg-9">
                     <div class="hero__search">
                         <div class="hero__search__form">
-                            <form action="{% url 'products_list' %}" method="POST">
+                            <form action="{% url 'product_list' %}" method="POST">
                                 {% csrf_token %}
                                 <div class="hero__search__categories">
                                     All Categories
@@ -219,7 +216,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="footer__about">
                         <div class="footer__about__logo">
-                            <a href="{% url 'home' %}"><img src="/media/images/img/logo.png" alt=""></a>
+                            <a href="{% url 'home' %}"><img src="/media/img/logo.png" alt=""></a>
                         </div>
                         <ul>
                             <li>Address: 47 Jurye-ro Sasang Busan</li>

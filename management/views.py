@@ -12,18 +12,13 @@ from django.views import View
 
 # Create your views here.
 
-# def dashboard(request):
-#     if not request.user.is_authenticated:
-#         return redirect('user_login')
-#     return render(request, 'templates/dashboard.html')
-
 
 class HomeRedirectView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:  # Assuming admin users have 'is_staff' set to True
             return redirect('dashboard')
         else:
-            return redirect('index')
+            return redirect('base')
 
 class DashboardView(LoginRequiredMixin, View):
     template_name = 'templates/dashboard.html'

@@ -73,32 +73,45 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 #             return self.render_to_response(context)
 
 def Base(request):
-	user = request.user
-	product = Item.objects.all()
-	if user.is_authenticated:
-		cart = Cart.objects.get(user=request.user)
-		cartitem = Item.objects.filter(cart=cart)
-		quantity = 0
-		for item in cartitem:	
-			quantity += item.quantity
+    user = request.user
+    product = Item.objects.all()
+    
+    if user.is_authenticated:
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cartitem = Item.objects.filter(cart=cart)
+            quantity = 0
+            for item in cartitem:
+                quantity += item.quantity
 
-		return render(request, 'base.html', {'products':product, 'quantity':quantity})
-	else:
-		return render(request, 'base.html', {'products':product})
+            return render(request, 'base.html', {'products': product, 'quantity': quantity})
+        
+        except Cart.DoesNotExist:
+            # Handle the case where the cart does not exist
+            return render(request, 'base.html', {'products': product, 'quantity': 0})
+    
+    else:
+        return render(request, 'base.html', {'products': product})
+    
 
 def Home(request):
-	user = request.user
-	product = Item.objects.all()
-	if user.is_authenticated:
-		cart = Cart.objects.get(user=request.user)
-		cartitem = Item.objects.filter(cart=cart)
-		quantity = 0
-		for item in cartitem:	
-			quantity += item.quantity
+    user = request.user
+    product = Item.objects.all()
 
-		return render(request, 'home.html', {'products':product, 'quantity':quantity})
-	else:
-		return render(request, 'home.html', {'products':product})
+    if user.is_authenticated:
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cartitem = Item.objects.filter(cart=cart)
+            quantity = sum(item.quantity for item in cartitem)
+
+            return render(request, 'home.html', {'products': product, 'quantity': quantity})
+        
+        except Cart.DoesNotExist:
+            # Handle the case where the cart does not exist
+            return render(request, 'home.html', {'products': product, 'quantity': 0})
+    
+    else:
+        return render(request, 'home.html', {'products': product})
     
 class DashboardView(TemplateView):
     template_name = 'dashboard.html'
