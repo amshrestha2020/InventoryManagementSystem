@@ -161,24 +161,24 @@
                             <span>All departments</span>
                         </div>
                         <ul>
-                            <li><a href="">Electronics</a></li>
-                            <li><a href="">Men</a></li>
-                            <li><a href="">Women</a></li>
-                            <li><a href="">Household</a></li>
-                            <li><a href="">Books</a></li>
-                            <li><a href="">Fashion</a></li>
-                            <li><a href="">Beauty</a></li>
-                            <li><a href="">Software</a></li>
-                            <li><a href="">Groceries</a></li>
-                            <li><a href="">Shoes</a></li>
-                            <li><a href="">Kids</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'electronics' %}">Electronics</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'men clothes' %}">Men</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'women clothes' %}">Women</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'household' %}">Household</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'books' %}">Books</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'fashion' %}">Fashion</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'beauty' %}">Beauty</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'software' %}">Software</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'groceries' %}">Groceries</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'shoes' %}">Shoes</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'kids' %}">Kids</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-lg-9">
                     <div class="hero__search">
                         <div class="hero__search__form">
-                            <form action="{% url 'products_list' %}" method="POST">
+                            <form action="{% url 'product_list' %}" method="POST">
                                 {% csrf_token %}
                                 <div class="hero__search__categories">
                                     All Categories
@@ -219,27 +219,27 @@
                 <div class="categories__slider owl-carousel">
                     <div class="col-lg-3">
                         <div class="categories__item set-bg" data-setbg="/media/images/macbook_pro.jpeg">
-                            <h5><a href="">Electronics</a></h5>
+                            <h5><a href="{% url 'sorted_product_list' 'electronics' %}">Electronics</a></h5>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="categories__item set-bg" data-setbg="/media/images/men-clothes-2.jpg">
-                            <h5><a href="">Men Clothes</a></h5>
+                            <h5><a href="{% url 'sorted_product_list' 'men clothes' %}">Men Clothes</a></h5>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="categories__item set-bg" data-setbg="/media/images/women-2.jpg">
-                            <h5><a href="">Women Clothes</a></h5>
+                            <h5><a href="{% url 'sorted_product_list' 'women clothes' %}">Women Clothes</a></h5>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="categories__item set-bg" data-setbg="/media/images/beauty.jpg">
-                            <h5><a href="">Beauty</a></h5>
+                            <h5><a href="{% url 'sorted_product_list' 'beauty' %}">Beauty</a></h5>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="categories__item set-bg" data-setbg="/media/images/educated.jpg">
-                            <h5><a href="">Books</a></h5>
+                            <h5><a href="{% url 'sorted_product_list' 'books' %}">Books</a></h5>
                         </div>
 					</div>
 					<div class="col-lg-3">
@@ -277,11 +277,11 @@
                     <div class="featured__item">
                         <div class="featured__item__pic set-bg" data-setbg="/media/images/dell.jpg">
                             <ul class="featured__item__pic__hover">
-                                <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                <li><a href="{% url "sorted_product_list" 'electronics' %}"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
-                            <h6><a href="">Dell alienware</a></h6>
+                            <h6><a href="{% url "sorted_product_list" 'electronics'%}">Dell alienware</a></h6>
                             <h5>$1349.00</h5>
                         </div>    
                     </div>
@@ -290,11 +290,11 @@
                     <div class="featured__item">
                         <div class="featured__item__pic set-bg" data-setbg="/media/images/women-2.jpg">
                             <ul class="featured__item__pic__hover">
-                                <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                <li><a href="{% url "sorted_product_list" 'women clothes'%}"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
-                            <h6><a href="">Long Dress</a></h6>
+                            <h6><a href="{% url "sorted_product_list" 'women clothes' %}">Long Dress</a></h6>
                             <h5>$109.99</h5>
                         </div>
                     </div>
@@ -303,11 +303,11 @@
                     <div class="featured__item">
                         <div class="featured__item__pic set-bg" data-setbg="/media/images/men-clothes-1.jpg">
                             <ul class="featured__item__pic__hover">
-                                <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                <li><a href="{% url "sorted_product_list" 'men clothes'%}"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
-                            <h6><a href="">Classic Jacket</a></h6>
+                            <h6><a href="{% url "sorted_product_list" 'men clothes'%}">Classic Jacket</a></h6>
                             <h5>$75.00</h5>
                         </div>
                     </div>
@@ -316,11 +316,11 @@
                     <div class="featured__item">
                         <div class="featured__item__pic set-bg" data-setbg="/media/images/women-clothes-2.jpg">
                             <ul class="featured__item__pic__hover">
-                                <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                <li><a href="{% url "sorted_product_list" 'women clothes'%}"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
-                            <h6><a href="">Women classic</a></h6>
+                            <h6><a href="{% url "sorted_product_list" 'women clothes'%}">Women classic</a></h6>
                             <h5>$89.00</h5>
                         </div>
                     </div>
@@ -329,11 +329,11 @@
                     <div class="featured__item">
                         <div class="featured__item__pic set-bg" data-setbg="/media/images/macbook_pro.jpeg">
                             <ul class="featured__item__pic__hover">
-                                <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                <li><a href="{% url "sorted_product_list" 'electronics'%}"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
-                            <h6><a href="">Macbook Pro</a></h6>
+                            <h6><a href="{% url "sorted_product_list" 'electronics'%}">Macbook Pro</a></h6>
                             <h5>$1799.00</h5>
                         </div>
                     </div>
@@ -342,11 +342,11 @@
                     <div class="featured__item">
                         <div class="featured__item__pic set-bg" data-setbg="/media/images/iMac.jpg">
                             <ul class="featured__item__pic__hover">
-                                <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                <li><a href="{% url "sorted_product_list" 'electronics'%}"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
-                            <h6><a href="">iMac</a></h6>
+                            <h6><a href="{% url "sorted_product_list" 'electronics'%}">iMac</a></h6>
                             <h5>$2499.00</h5>
                         </div>
                     </div>
@@ -355,11 +355,11 @@
                     <div class="featured__item">
                         <div class="featured__item__pic set-bg" data-setbg="/media/images/beauty.jpg">
                             <ul class="featured__item__pic__hover">
-                                <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                <li><a href="{% url "sorted_product_list" 'beauty'%}"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
-                            <h6><a href="">Beauty collection</a></h6>
+                            <h6><a href="{% url "sorted_product_list" 'beauty'%}">Beauty collection</a></h6>
                             <h5>$69.00</h5>
                         </div>
                     </div>
@@ -368,11 +368,11 @@
                     <div class="featured__item">
                         <div class="featured__item__pic set-bg" data-setbg="/media/images/educated.jpg">
                             <ul class="featured__item__pic__hover">
-                                <li><a href=""><i class="fa fa-shopping-cart"></i></a></li>
+                                <li><a href="{% url "sorted_product_list" 'books'%}"><i class="fa fa-shopping-cart"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">
-                            <h6><a href="">Educated</a></h6>
+                            <h6><a href="{% url "sorted_product_list" 'books'%}">Educated</a></h6>
                             <h5>$18.00</h5>
                         </div>
                     </div>
@@ -397,7 +397,7 @@
 						<span>NEW PRODUCTS</span>
 						<h2>Sale season</h2>
 						<p>Free Pickup and Delivery Available</p>
-						<a href="{% url 'products_list' %}" class="primary-btn">SHOP NOW</a>
+						<a href="{% url 'product_list' %}" class="primary-btn">SHOP NOW</a>
 					</div>
 				</div>
 
@@ -406,7 +406,7 @@
 						<span style="color: white;">MANY OPTIONS</span>
 						<h2 style="color: white;">Sale season</h2>
 						<p style="color: white;">Free Pickup and Delivery Available</p>
-						<a href="{% url 'products_list' %}" class="primary-btn">SHOP NOW</a>
+						<a href="{% url 'product_list' %}" class="primary-btn">SHOP NOW</a>
 					</div>
 				</div>
             </div>
@@ -423,7 +423,7 @@
                         <h4>Latest Products</h4>
                         <div class="latest-product__slider owl-carousel">
                             <div class="latest-prdouct__slider__item">
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
 										<img src="/media/images/mac.jpg" class="img-responsive" alt="">
                                     </div>
@@ -432,7 +432,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -441,7 +441,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -452,7 +452,7 @@
                                 </a>
                             </div>
                             <div class="latest-prdouct__slider__item">
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -461,7 +461,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -470,7 +470,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -488,7 +488,7 @@
                         <h4>Top Rated Products</h4>
                         <div class="latest-product__slider owl-carousel">
                             <div class="latest-prdouct__slider__item">
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -497,7 +497,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -506,7 +506,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -517,7 +517,7 @@
                                 </a>
                             </div>
                             <div class="latest-prdouct__slider__item">
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -526,7 +526,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -535,7 +535,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -553,7 +553,7 @@
                         <h4>Review Products</h4>
                         <div class="latest-product__slider owl-carousel">
                             <div class="latest-prdouct__slider__item">
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -562,7 +562,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -571,7 +571,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -582,7 +582,7 @@
                                 </a>
                             </div>
                             <div class="latest-prdouct__slider__item">
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -591,7 +591,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -600,7 +600,7 @@
                                         <span>$2349.00</span>
                                     </div>
                                 </a>
-                                <a href="{% url 'products_list' %}" class="latest-product__item">
+                                <a href="{% url 'product_list' %}" class="latest-product__item">
                                     <div class="latest-product__item__pic">
                                         <img src="/media/images/mac.jpg" alt="">
                                     </div>
@@ -700,16 +700,16 @@
                         <h6>Useful Links</h6>
                         <ul>
                             <li><a href="#">About Us</a></li>
-                            <li><a href="">Men's Section</a></li>
-                            <li><a href="">Women's Section</a></li>
-                            <li><a href="">Kids' Section</a></li>
-                            <li><a href="">Groceries</a></li>
-                            <li><a href="">Shoes</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'men clothes' %}">Men's Section</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'women clothes' %}">Women's Section</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'kids clothes' %}">Kids' Section</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'groceries' %}">Groceries</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'shoes' %}">Shoes</a></li>
                         </ul>
                         <ul>
-                            <li><a href="">Household</a></li>
-                            <li><a href="">Books</a></li>
-                            <li><a href="">Electronics</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'household' %}">Household</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'books' %}">Books</a></li>
+                            <li><a href="{% url 'sorted_product_list' 'electronics' %}">Electronics</a></li>
                             <li><a href="{% url 'user_login' %}">Login</a></li>
                             <li><a href="{% url 'user_register' %}">Register</a></li>
                             <li><a href="">Contact</a></li>
