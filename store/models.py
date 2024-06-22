@@ -14,6 +14,8 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from accounts.models import Language
+from datetime import datetime
+
 
 # class Category(models.Model):
 #     """
@@ -57,6 +59,18 @@ class Category(MPTTModel):
 
     def get_absolute_url(self):
         return reverse('category_detail', kwargs={'slug': self.slug})
+
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    created_at = models.DateTimeField(default = datetime.now)
+
+    def __str__(self):
+        return self.user.username + "'s cart"
+    
+    class Meta:
+        managed = True
+        db_table = 'cart'
 
 
 class Item(models.Model):
@@ -104,9 +118,12 @@ class Item(models.Model):
             return ""
 
 
-    def __str__(self):
-        return f"{self.name} - Category: {self.category}, Quantity: {self.quantity}"
+    # def __str__(self):
+    #     return f"{self.name} - Category: {self.category}, Quantity: {self.quantity}"
 
+    def __str__(self):
+        return self.name
+    
     def get_absolute_url(self):
         return reverse('item-detail', kwargs={'slug': self.slug})
 
@@ -123,6 +140,9 @@ class Item(models.Model):
         if reviews["count"] is not None:
             cnt = int(reviews["count"])
         return cnt
+    
+    def get_category(self):
+        return self.category
     
     class Meta:
         ordering = ["name"]

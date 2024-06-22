@@ -16,7 +16,7 @@ import json
 from .forms import SearchForm
 from accounts.forms import ContactForm
 from accounts.models import Language, FAQ, Profile
-from store.models import Item, Category, CategoryLanguage, ProductLanguage, Images, Comment, Variants
+from store.models import Item, Category, CategoryLanguage, ProductLanguage, Images, Comment, Variants, Cart
 
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
@@ -26,52 +26,80 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 
-class IndexView(TemplateView):
-    template_name = 'home.html'
+# class IndexView(TemplateView):
+#     template_name = 'home.html'
 
-    def get(self, request, *args, **kwargs):
-        if not request.session.has_key('currency'):
-            request.session['currency'] = settings.DEFAULT_CURRENCY
+#     def get(self, request, *args, **kwargs):
+#         if not request.session.has_key('currency'):
+#             request.session['currency'] = settings.DEFAULT_CURRENCY
 
-        try:
-            setting = Setting.objects.get(pk=1)
-        except Setting.DoesNotExist:
-            setting = None
+#         try:
+#             setting = Setting.objects.get(pk=1)
+#         except Setting.DoesNotExist:
+#             setting = None
 
-        products_latest = Item.objects.all().order_by('-id')[:4]
+#         products_latest = Item.objects.all().order_by('-id')[:4]
 
-        defaultlang = settings.LANGUAGE_CODE[0:2]
-        currentlang = request.LANGUAGE_CODE[0:2]
+#         defaultlang = settings.LANGUAGE_CODE[0:2]
+#         currentlang = request.LANGUAGE_CODE[0:2]
 
-        if defaultlang != currentlang:
-            setting = SettingLang.objects.get(lang=currentlang)
-            products_latest = Item.objects.raw(
-                'SELECT p.id, p.price, l.title, l.description, l.slug '
-                'FROM product_product as p '
-                'LEFT JOIN product_productlang as l '
-                'ON p.id = l.product_id '
-                'WHERE l.lang=%s ORDER BY p.id DESC LIMIT 4', [currentlang])
+#         if defaultlang != currentlang:
+#             setting = SettingLang.objects.get(lang=currentlang)
+#             products_latest = Item.objects.raw(
+#                 'SELECT p.id, p.price, l.title, l.description, l.slug '
+#                 'FROM product_product as p '
+#                 'LEFT JOIN product_productlang as l '
+#                 'ON p.id = l.product_id '
+#                 'WHERE l.lang=%s ORDER BY p.id DESC LIMIT 4', [currentlang])
 
-        products_slider = Item.objects.all().order_by('id')[:4]
-        products_picked = Item.objects.all().order_by('?')[:4]
+#         products_slider = Item.objects.all().order_by('id')[:4]
+#         products_picked = Item.objects.all().order_by('?')[:4]
 
-        page = "home"
-        context = {
-            'setting': setting,
-            'page': page,
-            'products_slider': products_slider,
-            'products_latest': products_latest,
-            'products_picked': products_picked,
-        }
+#         page = "home"
+#         context = {
+#             'setting': setting,
+#             'page': page,
+#             'products_slider': products_slider,
+#             'products_latest': products_latest,
+#             'products_picked': products_picked,
+#         }
 
-        if request.user.is_authenticated:
-            if request.user.is_superuser:
-                return redirect('dashboard')
-            else:
-                return self.render_to_response(context)
-        else:
-            return self.render_to_response(context)
+#         if request.user.is_authenticated:
+#             if request.user.is_superuser:
+#                 return redirect('dashboard')
+#             else:
+#                 return self.render_to_response(context)
+#         else:
+#             return self.render_to_response(context)
 
+def Base(request):
+	user = request.user
+	product = Item.objects.all()
+	if user.is_authenticated:
+		cart = Cart.objects.get(user=request.user)
+		cartitem = Item.objects.filter(cart=cart)
+		quantity = 0
+		for item in cartitem:	
+			quantity += item.quantity
+
+		return render(request, 'base.html', {'products':product, 'quantity':quantity})
+	else:
+		return render(request, 'base.html', {'products':product})
+
+def Home(request):
+	user = request.user
+	product = Item.objects.all()
+	if user.is_authenticated:
+		cart = Cart.objects.get(user=request.user)
+		cartitem = Item.objects.filter(cart=cart)
+		quantity = 0
+		for item in cartitem:	
+			quantity += item.quantity
+
+		return render(request, 'home.html', {'products':product, 'quantity':quantity})
+	else:
+		return render(request, 'home.html', {'products':product})
+    
 class DashboardView(TemplateView):
     template_name = 'dashboard.html'
 
@@ -376,10 +404,13 @@ class SortedProductListView(ListView):
     def get_queryset(self):
         keyword = self.kwargs['keyword']
         if keyword == 'allclothes':
-            return Item.objects.filter(category__icontains='menclothes') | Item.objects.filter(category__icontains='menclothes womenclothes')
+            men_clothes = Category.objects.filter(title__icontains='menclothes')
+            women_clothes = Category.objects.filter(title__icontains='womenclothes')
+            return Item.objects.filter(category__in=men_clothes | women_clothes)
         else:
-            return Item.objects.filter(category__iexact=str(keyword))
-        
+            # Ensure case-insensitive matching by using icontains on category title
+            category = get_object_or_404(Category, title__iexact=keyword)
+            return Item.objects.filter(category=category)
 
 
 class UserSortedProductListView(ListView):
@@ -391,7 +422,7 @@ class UserSortedProductListView(ListView):
         if keyword == 'allclothes':
             return Item.objects.filter(category__icontains='menclothes') | Item.objects.filter(category__icontains='menclothes womenclothes')
         else:
-            return Item.objects.filter(category__iexact=str(keyword))
+            return Item.objects.filter(category__iexact = str(keyword))
 
 
 

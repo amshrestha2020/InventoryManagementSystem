@@ -17,13 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from homepage.views import (IndexView, 
+from homepage.views import ( 
                     DashboardView, 
                     ProductListView,
                     SortedProductListView,
                     UserSortedProductListView,
                     UserProductListView,)
 
+from homepage.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,9 +38,11 @@ urlpatterns = [
 
     path('admin_dashboard/', DashboardView.as_view(), name='admin_dashboard'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
-    path('', IndexView.as_view(), name='home'),
-    path('prod/', UserProductListView.as_view(), name = 'productlist'),
-    path('prod/', ProductListView.as_view(), name='product_list'),
+    # path('', IndexView.as_view(), name='home'),
+    path('', Home, name='home'),
+    path('', Base, name='base'),
+    path('product/', UserProductListView.as_view(), name = 'productlist'),
+    path('product/', ProductListView.as_view(), name='product_list'),
     path('sortedproducts/<str:keyword>/', SortedProductListView.as_view(), name='sorted_product_list'),
     path('usersortedproducts/<str:keyword>/', UserSortedProductListView.as_view(), name='user_sorted_product_list'),
 
