@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'mptt',
     'currencies',
     'ckeditor_uploader',
+    'django_countries',
+
 
 
     # backend_app

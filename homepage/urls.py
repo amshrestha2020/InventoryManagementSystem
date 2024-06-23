@@ -12,7 +12,8 @@ from .views import ( SelectLanguageView,
                     ProductListView,
                     SortedProductListView,
                     UserSortedProductListView,
-                    UserProductListView, )
+                    UserProductListView,
+                    OrderSummary, )
 
 
 urlpatterns = [
@@ -27,5 +28,5 @@ urlpatterns = [
     path('selectcurrency/', SelectCurrencyView.as_view(), name='selectcurrency'),
     path('savelangcur/', SaveLangCurView.as_view(), name='savelangcur'),
     
-
+    path('order_summary/', OrderSummary.as_view(), name='order_summary'),
 ]

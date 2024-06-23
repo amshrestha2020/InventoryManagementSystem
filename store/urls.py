@@ -1,5 +1,4 @@
 from django.urls import path
-from . import views
 from django.conf.urls.static import static
 from django.conf import settings
 from .views import (
@@ -20,8 +19,7 @@ from .views import (
 from accounts.views import ColorsView
 
 urlpatterns = [
-    path('', views.dashboard, name='dashboard'),
-    path('products/',ProductListView.as_view(), name="products_list"),
+    path('product/',ProductListView.as_view(), name="products_list"),
     path('product/<slug:slug>/', ProductDetailView.as_view(), name='products_detail'),
     path('new-product/', ProductCreateView.as_view(), name='products_create'),
     path('product/<slug:slug>/update/', ProductUpdateView.as_view(), name='products_update'),

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'main.html' %}
 <title>{% block title %}eBazar | Products{% endblock %}</title>
 
 {% load static %}
@@ -121,27 +121,27 @@ body {
                             <h4 class="sidebar-title">Latest Products</h4>
                             <div class="latest-product__slider owl-carousel">
                                 <div class="latest-prdouct__slider__item">
-                                    <a href="#" class="latest-product__item">
+                                    <a href="{% url 'product_list' %}" class="latest-product__item">
                                         <div class="latest-product__item__pic">
-                                            <img src="/media/images/mac.jpg" alt="">
+                                            <img src="{% static "images/mac.jpg" %}" alt="">
                                         </div>
                                         <div class="latest-product__item__text">
                                             <h6>Macbook Pro</h6>
                                             <span>$2349.00</span>
                                         </div>
                                     </a>
-                                    <a href="#" class="latest-product__item">
+                                    <a href="{% url 'product_list' %}" class="latest-product__item">
                                         <div class="latest-product__item__pic">
-                                            <img src="/media/images/mac.jpg" alt="">
+                                            <img src="{% static "images/mac.jpg" %}" alt="">
                                         </div>
                                         <div class="latest-product__item__text">
                                             <h6>Macbook Pro</h6>
                                             <span>$2349.00</span>
                                         </div>
                                     </a>
-                                    <a href="#" class="latest-product__item">
+                                    <a href="{% url 'product_list' %}" class="latest-product__item">
                                         <div class="latest-product__item__pic">
-                                            <img src="/media/images/mac.jpg" alt="">
+                                            <img src="{% static "images/mac.jpg" %}" alt="">
                                         </div>
                                         <div class="latest-product__item__text">
                                             <h6>Macbook Pro</h6>
@@ -150,27 +150,27 @@ body {
                                     </a>
                                 </div>
                                 <div class="latest-prdouct__slider__item">
-                                    <a href="#" class="latest-product__item">
+                                    <a href="{% url 'product_list' %}" class="latest-product__item">
                                         <div class="latest-product__item__pic">
-                                            <img src="/media/images/mac.jpg" alt="">
+                                            <img src="{% static "images/mac.jpg" %}" alt="">
                                         </div>
                                         <div class="latest-product__item__text">
                                             <h6>Macbook Pro</h6>
                                             <span>$2349.00</span>
                                         </div>
                                     </a>
-                                    <a href="#" class="latest-product__item">
+                                    <a href="{% url 'product_list' %}" class="latest-product__item">
                                         <div class="latest-product__item__pic">
-                                            <img src="/media/images/mac.jpg" alt="">
+                                            <img src="{% static "images/mac.jpg" %}" alt="">
                                         </div>
                                         <div class="latest-product__item__text">
                                             <h6>Macbook Pro</h6>
                                             <span>$2349.00</span>
                                         </div>
                                     </a>
-                                    <a href="#" class="latest-product__item">
+                                    <a href="{% url 'product_list' %}" class="latest-product__item">
                                         <div class="latest-product__item__pic">
-                                            <img src="/media/images/mac.jpg" alt="">
+                                            <img src="{% static "images/mac.jpg" %}" alt="">
                                         </div>
                                         <div class="latest-product__item__text">
                                             <h6>Macbook Pro</h6>

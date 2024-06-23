@@ -23,7 +23,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.exceptions import ObjectDoesNotExist
 
+from django.db.models import Q
 
 
 # class IndexView(TemplateView):
@@ -94,24 +96,25 @@ def Base(request):
         return render(request, 'base.html', {'products': product})
     
 
-def Home(request):
-    user = request.user
-    product = Item.objects.all()
+class HomeView(ListView):
+    model = Item
+    template_name = "home.html"
+    paginate_by = 8
+    ordering = '-id'
 
-    if user.is_authenticated:
-        try:
-            cart = Cart.objects.get(user=request.user)
-            cartitem = Item.objects.filter(cart=cart)
-            quantity = sum(item.quantity for item in cartitem)
-
-            return render(request, 'home.html', {'products': product, 'quantity': quantity})
-        
-        except Cart.DoesNotExist:
-            # Handle the case where the cart does not exist
-            return render(request, 'home.html', {'products': product, 'quantity': 0})
-    
-    else:
-        return render(request, 'home.html', {'products': product})
+    def get_queryset(self):
+        queryset = Item.objects.all()
+        category = self.kwargs.get('category_name')
+        search_by = self.request.GET.get('key')
+        # Return queryset filtered by the category
+        if category:
+            queryset = queryset.filter(item_category__category=category)
+        if search_by:
+            queryset = queryset.filter(
+                Q(item_category__category__icontains=search_by) |
+                Q(item_name__icontains=search_by)
+            )
+        return queryset.order_by('id')
     
 class DashboardView(TemplateView):
     template_name = 'dashboard.html'
@@ -447,3 +450,18 @@ class UserProductListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Item.objects.filter(created_by=self.request.user)
+    
+
+class OrderSummary(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        try:
+            order = Cart.objects.get(user=self.request.user, ordered=False)
+            if order.items.count() == 0:
+                return redirect("item_list")  # Redirect to item list if cart is empty
+            context = {
+                'object': order
+            }
+            return render(self.request, 'order_summary.html', context)
+        except ObjectDoesNotExist:
+            # Handle the case where the cart does not exist for the user
+            return redirect("/")  # Redirect to home page if cart does not exist
