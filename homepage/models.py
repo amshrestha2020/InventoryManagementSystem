@@ -18,13 +18,6 @@ class Language(models.Model):
 
 
 
-llist = Language.objects.filter(status=True)
-list1 = []
-for rs in llist:
-    list1.append((rs.code,rs.name))
-langlist = (list1)
-
-
 class Setting(models.Model):
     STATUS = (
         ('True', 'True'),
@@ -60,7 +53,7 @@ class Setting(models.Model):
 
 class SettingLang(models.Model):
     setting = models.ForeignKey(Setting, on_delete=models.CASCADE) #many to one relation with Category
-    language =  models.CharField(max_length=6, choices=langlist)
+    language =  models.CharField(max_length=6)
     title = models.CharField(max_length=150)
     keywords = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
@@ -99,7 +92,7 @@ class FAQ(models.Model):
         ('True', 'True'),
         ('False', 'False'),
     )
-    language =  models.CharField(max_length=6, choices=langlist, blank=True, null=True)
+    language =  models.CharField(max_length=6, blank=True, null=True)
     ordernumber = models.IntegerField()
     question = models.CharField(max_length=200)
     answer = RichTextUploadingField()

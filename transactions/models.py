@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from store.models import Item
-from accounts.models import Profile, Vendor
+from accounts.models import Profile
 from django_extensions.db.fields import AutoSlugField
 
 # Create your models here.
@@ -49,7 +49,6 @@ class Purchase(models.Model):
     slug = AutoSlugField(unique=True , populate_from='vendor')
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     description = models.TextField(max_length=300, blank=True, null=True)
-    vendor = models.ForeignKey(Vendor, related_name='vendor', on_delete=models.CASCADE, blank=False, null=False)
     order_date = models.DateTimeField(auto_now_add=True)
     delivery_date = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True, verbose_name=('Delivery Date'))
     quantity = models.FloatField(default=0.00, blank=False, null=False)

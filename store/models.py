@@ -5,16 +5,12 @@ from django.db import models
 from django.urls import reverse
 from django_extensions.db.fields import AutoSlugField
 from phonenumber_field.modelfields import PhoneNumberField
-from management.models import Vendor
-from django.forms import ModelForm
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 from django.db.models import Avg, Count
-from ckeditor_uploader.fields import RichTextUploadingField
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from accounts.models import Language
-from datetime import datetime
 from django.conf import settings
 from django_countries import countries
 from django_countries.fields import CountryField
@@ -76,7 +72,6 @@ class Item(models.Model):
     quantity = models.FloatField(default=0.00)
     selling_price = models.FloatField(default=0)
     expiring_date = models.DateTimeField(null=True, blank=True)
-    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=150)
     keywords = models.CharField(max_length=255)
     description = models.TextField(max_length=255)
@@ -85,7 +80,6 @@ class Item(models.Model):
     amount = models.IntegerField(default=0)
     minamount = models.IntegerField(default=3)
     variant = models.CharField(max_length=10,choices=VARIANTS, default='None')
-    detail = RichTextUploadingField()
     status = models.CharField(max_length=10,choices=STATUS)
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
@@ -335,36 +329,3 @@ class Variants(models.Model):
              return mark_safe('<img src="{}" height="50"/>'.format(img.image.url))
         else:
             return ""
-
-
-llist= Language.objects.all()
-list1=[]
-for rs in llist:
-    list1.append((rs.code,rs.name))
-langlist= (list1)
-
-
-class ProductLanguage(models.Model):
-    product = models.ForeignKey(Item, on_delete=models.CASCADE) #many to one relation with Category
-    language =  models.CharField(max_length=6, choices=langlist)
-    title = models.CharField(max_length=150)
-    keywords = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
-    slug = models.SlugField(null=False, unique=True)
-    detail=RichTextUploadingField()
-
-    def get_absolute_url(self):
-        return reverse('products_detail', kwargs={'slug': self.slug})
-
-class CategoryLanguage(models.Model):
-    category = models.ForeignKey(Category, related_name='categorylanguages', on_delete=models.CASCADE) #many to one relation with Category
-    language =  models.CharField(max_length=6, choices=langlist)
-    title = models.CharField(max_length=150)
-    keywords = models.CharField(max_length=255)
-    slug = models.SlugField(null=False, unique=True)
-    description = models.CharField(max_length=255)
-
-    def get_absolute_url(self):
-        return reverse('category_detail', kwargs={'slug': self.slug})
-    
-

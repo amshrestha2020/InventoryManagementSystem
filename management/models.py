@@ -1,6 +1,7 @@
 from django.db import models
 from django_extensions.db.fields import AutoSlugField
-
+from store.models import Item
+from transactions.models import Sale, Purchase
 
 # Create your models here.
 class Vendor(models.Model):
@@ -28,50 +29,6 @@ class Unit(models.Model):
     def __str__(self):
         return self.title
 
-class Product(models.Model):
-    title = models.CharField(max_length=50)
-    detail = models.TextField()
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to="product/")
-
-    class Meta:
-        verbose_name_plural = 'Products'
-
-    def __str__(self):
-        return self.title
-
-class Purchase(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-    quantity = models.FloatField()
-    price = models.FloatField()
-    total_amount = models.FloatField(editable=False, default=0)
-    purchase_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name_plural = 'Purchases'
-    
-    def save(self, *args, **kwargs):
-        self.total_amount = self.quantity * self.price
-        super(Purchase, self).save(*args, **kwargs)
-
-        # Update inventory effect related to purchase
-        inventory = Inventory.objects.filter(
-            product=self.product
-            ).order_by('-id').first()
-        if inventory:
-            totalBal = inventory.total_balance_quantity + self.quantity
-        else:
-            totalBal = self.quantity
-        # Insert in inventory 
-        Inventory.objects.create(
-            product = self.product,
-            purchase = self,
-            sale = None,
-            purchase_quantity = self.quantity,
-            sale_quantity = None,
-            total_balance_quantity = totalBal
-        )
 
 class Customer(models.Model):
     name = models.CharField(max_length=50)
@@ -87,49 +44,13 @@ class Customer(models.Model):
     def __str__(self):
         return self.name
 
-class Sale(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,null=True)
-    quantity = models.FloatField()
-    price = models.FloatField()
-    # It calculates by itself
-    total_amount = models.FloatField(editable=False)
-    sale_date = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name_plural = 'Sales'
-    
-    def save(self, *args, **kwargs):
-        self.total_amount = self.quantity * self.price
-        super(Sale, self).save(*args, **kwargs)
-
-        # Update inventory effect related to sale
-        inventory = Inventory.objects.filter(
-            product=self.product
-            ).order_by('-id').first()
-        
-        totalBal = 0
-        if inventory:
-            totalBal = inventory.total_balance_quantity - self.quantity
-
-        # Insert in inventory 
-        Inventory.objects.create(
-            product = self.product,
-            purchase = None,
-            sale = self,
-            purchase_quantity = None,
-            sale_quantity = self.quantity,
-            total_balance_quantity = totalBal
-        )
-
 class Inventory(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Item, on_delete=models.CASCADE)
     purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, 
         default=0, null=True)
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, 
         default=0, null=True)
 
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, null=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     
     purchase_quantity = models.FloatField(default=0, null=True)

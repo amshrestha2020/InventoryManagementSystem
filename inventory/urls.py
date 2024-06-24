@@ -20,8 +20,6 @@ from django.contrib.auth import views as auth_views
 from homepage.views import ( 
                     DashboardView, 
                     ProductListView,
-                    SortedProductListView,
-                    UserSortedProductListView,
                     UserProductListView,)
 from django.conf.urls.static import static
 
@@ -39,13 +37,10 @@ urlpatterns = [
 
     path('admin_dashboard/', DashboardView.as_view(), name='admin_dashboard'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
-    # path('', IndexView.as_view(), name='home'),
     path('', HomeView.as_view(), name='home'),
     path('', Base, name='base'),
     path('product/', UserProductListView.as_view(), name = 'productlist'),
-    path('product/', ProductListView.as_view(), name='product_list'),
-    path('sortedproducts/<str:keyword>/', SortedProductListView.as_view(), name='sorted_product_list'),
-    path('usersortedproducts/<str:keyword>/', UserSortedProductListView.as_view(), name='user_sorted_product_list'),
+    path('product/', ProductListView.as_view(), name='product-list'),
 
 
 

@@ -10,5 +10,5 @@ class SaleAdmin(admin.ModelAdmin):
 
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
-    fields = ('item', 'description', 'vendor', 'order_date', 'delivery_date', 'quantity', 'price', 'delivery_status')
-    list_display = ('item', 'vendor', 'order_date', 'delivery_date', 'quantity', 'delivery_status', 'price', 'total_value')
+    fields = ('item', 'description', 'order_date', 'delivery_date', 'quantity', 'price', 'delivery_status')
+    list_display = ('item', 'order_date', 'delivery_date', 'quantity', 'delivery_status', 'price', 'total_value')

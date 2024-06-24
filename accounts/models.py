@@ -2,13 +2,10 @@ from django.db import models
 
 # Create your models here.
 from django.contrib.auth.models import User
-from django.utils import timezone
 from imagekit.models import ProcessedImageField
 from imagekit.processors import ResizeToFill
 from phonenumber_field.modelfields import PhoneNumberField
-from django.utils.text import slugify
 from django_extensions.db.fields import AutoSlugField
-from management.models import Vendor
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.forms import ModelForm, TextInput, Textarea
 from currencies.models import Currency
@@ -41,12 +38,6 @@ class Language(models.Model):
 
 
 
-llist = Language.objects.filter(status=True)
-list1 = []
-for rs in llist:
-    list1.append((rs.code,rs.name))
-langlist = (list1)
-
 
 
 class Profile(models.Model):
@@ -64,7 +55,6 @@ class Profile(models.Model):
     address = models.CharField(blank=True, max_length=150)
     city = models.CharField(blank=True, max_length=20)
     country = models.CharField(blank=True, max_length=50)
-    language = models.ForeignKey(Language, on_delete=models.CASCADE, null=True,blank=True)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, null=True,blank=True)
 
     @property
@@ -121,7 +111,6 @@ class Setting(models.Model):
 
 class SettingLanguage(models.Model):
     setting = models.ForeignKey(Setting, on_delete=models.CASCADE) #many to one relation with Category
-    language =  models.CharField(max_length=6, choices=langlist)
     title = models.CharField(max_length=150)
     keywords = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
@@ -159,7 +148,7 @@ class FAQ(models.Model):
         ('True', 'True'),
         ('False', 'False'),
     )
-    language =  models.CharField(max_length=6, blank=True, null=True, choices=langlist)
+    language =  models.CharField(max_length=6, blank=True, null=True)
     ordernumber = models.IntegerField()
     question = models.CharField(max_length=200)
     answer = RichTextUploadingField()

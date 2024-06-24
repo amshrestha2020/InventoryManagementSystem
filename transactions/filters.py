@@ -9,4 +9,4 @@ class SaleFilter(django_filters.FilterSet):
 class PurchaseFilter(django_filters.FilterSet):
     class Meta:
         model = Purchase
-        fields = ['item', 'vendor','delivery_status']
+        fields = ['item', 'delivery_status']

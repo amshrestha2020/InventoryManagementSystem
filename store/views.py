@@ -20,7 +20,7 @@ from django_tables2.export.export import TableExport
 from django.db.models import Q, Count, Sum, Avg
 from django.views.generic.edit import FormMixin
 
-from accounts.models import Profile, Vendor
+from accounts.models import Profile
 from transactions.models import Sale
 from store.models import Category, Item, Delivery
 from store.forms import ProductForm

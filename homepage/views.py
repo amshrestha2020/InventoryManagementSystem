@@ -16,7 +16,7 @@ import json
 from .forms import SearchForm
 from accounts.forms import ContactForm
 from accounts.models import Language, FAQ, Profile
-from store.models import Item, Category, CategoryLanguage, ProductLanguage, Images, Comment, Variants, Cart
+from store.models import Item, Category, Images, Comment, Variants, Cart
 
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
@@ -98,7 +98,7 @@ def Base(request):
 
 class HomeView(ListView):
     model = Item
-    template_name = "home.html"
+    template_name = "main.html"
     paginate_by = 8
     ordering = '-id'
 
@@ -123,16 +123,6 @@ class DashboardView(TemplateView):
         if not request.user.is_authenticated:
             return redirect('login')
         return super().get(request, *args, **kwargs)
-
-
-class SelectLanguageView(View):
-    def post(self, request, *args, **kwargs):
-        cur_language = translation.get_language()
-        lasturl = request.META.get('HTTP_REFERER')
-        lang = request.POST['language']
-        translation.activate(lang)
-        request.session[translation.LANGUAGE_SESSION_KEY] = lang
-        return HttpResponseRedirect("/" + lang)
 
 
 
@@ -179,40 +169,6 @@ class ContactUsView(FormView):
         return context
     
 
-
-
-class CategoryProductsView(ListView):
-    template_name = 'category_products.html'
-    context_object_name = 'products'
-
-    def get_queryset(self):
-        id = self.kwargs['id']
-        defaultlang = settings.LANGUAGE_CODE[0:2]
-        currentlang = self.request.LANGUAGE_CODE[0:2]
-        if defaultlang == currentlang:
-            return Item.objects.filter(category_id=id)
-        else:
-            return Item.objects.raw(
-                'SELECT p.id,p.price,p.amount,p.image,p.variant,l.title, l.keywords, l.description,l.slug,l.detail '
-                'FROM product_product as p '
-                'LEFT JOIN product_productlang as l '
-                'ON p.id = l.product_id '
-                'WHERE p.category_id=%s and l.lang=%s', [id, currentlang]
-            )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        id = self.kwargs['id']
-        defaultlang = settings.LANGUAGE_CODE[0:2]
-        currentlang = self.request.LANGUAGE_CODE[0:2]
-        catdata = get_object_or_404(Category, pk=id)
-        if defaultlang != currentlang:
-            try:
-                catdata = get_object_or_404(CategoryLanguage, category_id=id, lang=currentlang)
-            except CategoryLanguage.DoesNotExist:
-                pass
-        context['catdata'] = catdata
-        return context
 
 
 
@@ -357,100 +313,29 @@ class FaqView(View):
 
 
 
-class SelectCurrencyView(View):
-    def post(self, request):
-        lasturl = request.META.get('HTTP_REFERER')
-        request.session['currency'] = request.POST['currency']
-        return HttpResponseRedirect(lasturl)
-
-
-
-@method_decorator(login_required(login_url='/login'), name='dispatch')
-class SaveLangCurView(View):
-    def post(self, request):
-        lasturl = request.META.get('HTTP_REFERER')
-        current_user = request.user
-        language = get_object_or_404(Language, code=request.LANGUAGE_CODE[0:2])
-        data = get_object_or_404(Profile, user_id=current_user.id)
-        data.language_id = language.id
-        data.currency_id = request.session['currency']
-        data.save()
-        return HttpResponseRedirect(lasturl)
-    
-
 
 class ProductListView(View):
     template_name = 'product_list.html'
 
     def get(self, request):
         items = Item.objects.all()
-        page = request.GET.get('page', 1)
-
-        paginator = Paginator(items, 9)
-        try:
-            items = paginator.page(page)
-        except PageNotAnInteger:
-            items = paginator.page(1)
-        except EmptyPage:
-            items = paginator.page(paginator.num_pages)
-
         return render(request, self.template_name, {'product_list': items})
 
     def post(self, request):
         search_query = request.POST.get('search', '')
         items = Item.objects.filter(name__icontains=search_query)
-
-        page = request.GET.get('page', 1)
-        paginator = Paginator(items, 1)
-        try:
-            items = paginator.page(page)
-        except PageNotAnInteger:
-            items = paginator.page(1)
-        except EmptyPage:
-            items = paginator.page(paginator.num_pages)
-
         return render(request, self.template_name, {'product_list': items})
-
-
-
-class SortedProductListView(ListView):
-    template_name = 'product_list.html'
-    context_object_name = 'product_list'
-
-    def get_queryset(self):
-        keyword = self.kwargs['keyword']
-        if keyword == 'allclothes':
-            men_clothes = Category.objects.filter(title__icontains='menclothes')
-            women_clothes = Category.objects.filter(title__icontains='womenclothes')
-            return Item.objects.filter(category__in=men_clothes | women_clothes)
-        else:
-            # Ensure case-insensitive matching by using icontains on category title
-            category = get_object_or_404(Category, title__iexact=keyword)
-            return Item.objects.filter(category=category)
-
-
-class UserSortedProductListView(ListView):
-    template_name = 'product_list.html'
-    context_object_name = 'product_list'
-
-    def get_queryset(self):
-        keyword = self.kwargs['keyword']
-        if keyword == 'allclothes':
-            return Item.objects.filter(category__icontains='menclothes') | Item.objects.filter(category__icontains='menclothes womenclothes')
-        else:
-            return Item.objects.filter(category__iexact = str(keyword))
-
-
+    
 
 class UserProductListView(LoginRequiredMixin, ListView):
     model = Item
     template_name = 'user_products.html'
-    context_object_name = 'productlist'
+    context_object_name = 'product_list'  # Ensure the context variable is the same as in the template
     login_url = 'login'  # URL to redirect to when the user is not logged in
 
     def get_queryset(self):
         return Item.objects.filter(created_by=self.request.user)
-    
+
 
 class OrderSummary(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
