@@ -16,11 +16,6 @@ from django_countries import countries
 from django_countries.fields import CountryField
 
 
-ADDRESS_CHOICES = (
-    ('B', 'Billing'),
-    ('S', 'Shipping')
-)
-
 
 class Category(MPTTModel):
     STATUS = (
@@ -44,96 +39,53 @@ class Category(MPTTModel):
         order_insertion_by = ['title']
 
     def get_absolute_url(self):
-        return reverse('category_detail', kwargs={'slug': self.slug})
+        return reverse("item_list_by_category", kwargs={
+            "category_name": self.title
+        })
 
 
 
+LABEL_CHOICES = (
+    ('P', 'primary'),
+    ('S', 'secondary'),
+    ('D', 'danger')
+)
+
+ADDRESS_CHOICES = (
+    ('B', 'Billing'),
+    ('S', 'Shipping')
+)
 
 
 class Item(models.Model):
-    """
-    Represents an item in the inventory.
-    """
-    STATUS = (
-        ('True', 'True'),
-        ('False', 'False'),
-    )
-
-    VARIANTS = (
-        ('None', 'None'),
-        ('Size', 'Size'),
-        ('Color', 'Color'),
-        ('Size-Color', 'Size-Color'),
-    )
-
-    slug = AutoSlugField(unique=True , populate_from='name')
-    name = models.CharField(max_length=50, blank=False, null=False)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    quantity = models.FloatField(default=0.00)
-    selling_price = models.FloatField(default=0)
-    expiring_date = models.DateTimeField(null=True, blank=True)
-    title = models.CharField(max_length=150)
-    keywords = models.CharField(max_length=255)
-    description = models.TextField(max_length=255)
-    image=models.ImageField(upload_to='images/',null=False)
-    price = models.DecimalField(max_digits=12, decimal_places=2,default=0)
-    amount = models.IntegerField(default=0)
-    minamount = models.IntegerField(default=3)
-    variant = models.CharField(max_length=10,choices=VARIANTS, default='None')
-    status = models.CharField(max_length=10,choices=STATUS)
-    create_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
-    def image_tag(self):
-        if self.image.url is not None:
-            return mark_safe('<img src="{}" height="50"/>'.format(self.image.url))
-        else:
-            return ""
-
-
-    # def __str__(self):
-    #     return f"{self.name} - Category: {self.category}, Quantity: {self.quantity}"
+    item_name = models.CharField(max_length=100)
+    item_category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    price = models.FloatField()
+    discount_price = models.FloatField(blank=True, null=True)
+    item_image = models.ImageField(upload_to='items_images/')
+    labels = models.CharField(choices=LABEL_CHOICES, max_length=2)
+    slug = models.SlugField(unique=True)
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
+    description = models.TextField()
 
     def __str__(self):
-        return self.name
-    
+        return self.item_name
+
+    def get_absolute_url(self):
+        return reverse('homepage:products', kwargs={
+            'slug': self.slug
+        })
+
     def get_add_to_cart(self):
-        return reverse('store:add_to_cart', kwargs={
+        return reverse('add_to_cart', kwargs={
             'slug': self.slug
         })
 
     def remove_from_the_cart(self):
-        return reverse('store:remove_from_the_cart', kwargs={
+        return reverse('remove_from_the_cart', kwargs={
             'slug':self.slug
         })
-    
-    def get_absolute_url(self):
-        return reverse("homepage:item_list_by_category", kwargs={
-            "category_name": self.category
-        })
 
-    def averagereview(self):
-        reviews = Comment.objects.filter(product=self, status='True').aggregate(avg=Avg('rate'))
-        average = 0
-        if reviews["avg"] is not None:
-            average = float(reviews["avg"])
-        return average
-
-    def countreview(self):
-        reviews = Comment.objects.filter(product=self, status='True').aggregate(count=Count('id'))
-        cnt = 0
-        if reviews["count"] is not None:
-            cnt = int(reviews["count"])
-        return cnt
-    
-    def get_category(self):
-        return self.category
-    
-    class Meta:
-        ordering = ["name"]
-        verbose_name_plural = "Items"
 
 
 class OrderItem(models.Model):
@@ -143,7 +95,7 @@ class OrderItem(models.Model):
     ordered = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.quantity} of {self.item.item_name}"
+        return f"{self.quantity} of {self.item.name}"
 
     def get_total_price(self):
         return self.item.price * self.quantity

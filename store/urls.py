@@ -18,6 +18,7 @@ from .views import (
 
 from accounts.views import ColorsView
 
+
 urlpatterns = [
     path('product/',ProductListView.as_view(), name="products_list"),
     path('product/<slug:slug>/', ProductDetailView.as_view(), name='products_detail'),

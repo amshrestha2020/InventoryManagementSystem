@@ -141,7 +141,7 @@ class SaleCreateView(LoginRequiredMixin, CreateView):
     """View to create a new sale."""
     model = Sale
     template_name = 'sales_create.html'
-    fields = ['item', 'customer_name', 'payment_method', 'quantity', 'amount_received']
+    fields = ['item', 'first_name', 'payment_method', 'quantity', 'amount_received']
 
     def get_success_url(self):
         return reverse('sales_list')

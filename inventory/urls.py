@@ -19,8 +19,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from homepage.views import ( 
                     DashboardView, 
-                    ProductListView,
-                    UserProductListView,)
+                    ProductListView,)
 from django.conf.urls.static import static
 
 from homepage.views import *
@@ -39,8 +38,10 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('', HomeView.as_view(), name='home'),
     path('', Base, name='base'),
-    path('product/', UserProductListView.as_view(), name = 'productlist'),
-    path('product/', ProductListView.as_view(), name='product-list'),
+    path('', ProductListView.as_view(), name='items'),
+    path('item_list/<category_name>/', HomeView.as_view(), name='item_list_by_category'),
+    path('product/<slug:slug>/', ProductDetailView.as_view(), name='product_detail'),
+
 
 
 

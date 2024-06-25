@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
-from django.views.generic import TemplateView, ListView, FormView, View
+from django.views.generic import TemplateView, ListView, FormView, View, DetailView
 from django.conf import settings
 from .models import Setting, SettingLang, ContactMessage
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
@@ -98,7 +98,7 @@ def Base(request):
 
 class HomeView(ListView):
     model = Item
-    template_name = "main.html"
+    template_name = "home.html"
     paginate_by = 8
     ordering = '-id'
 
@@ -115,6 +115,16 @@ class HomeView(ListView):
                 Q(item_name__icontains=search_by)
             )
         return queryset.order_by('id')
+    
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        host = self.request.get_host()
+        categories = Category.objects.all()
+        context['categories'] = categories
+        context['host'] = host
+        return context
+    
+
     
 class DashboardView(TemplateView):
     template_name = 'dashboard.html'
@@ -212,73 +222,15 @@ class SearchAutoView(View):
 
 
 
-class ProductDetailView(View):
+class ProductDetailView(DetailView):
+    model = Item
     template_name = 'product_detail.html'
+    context_object_name = 'product'
+    
+    def get_object(self):
+        return get_object_or_404(Item, slug=self.kwargs['slug'])
 
-    def get(self, request, id, slug):
-        query = request.GET.get('q')
-        defaultlang = settings.LANGUAGE_CODE[0:2]
-        currentlang = request.LANGUAGE_CODE[0:2]
-        category = Category.objects.all()
-        product = get_object_or_404(Item, pk=id)
 
-        if defaultlang != currentlang:
-            try:
-                prolang = Item.objects.raw(
-                    'SELECT p.id, p.price, p.amount, p.image, p.variant, l.title, l.keywords, l.description, l.slug, l.detail '
-                    'FROM product_product as p '
-                    'INNER JOIN product_productlang as l '
-                    'ON p.id = l.product_id '
-                    'WHERE p.id = %s and l.lang = %s', [id, currentlang])
-                product = prolang[0]
-            except:
-                pass
-
-        images = Images.objects.filter(product_id=id)
-        comments = Comment.objects.filter(product_id=id, status='True')
-        context = {'product': product, 'category': category, 'images': images, 'comments': comments}
-
-        if product.variant != "None":
-            variants = Variants.objects.filter(product_id=id)
-            colors = Variants.objects.filter(product_id=id, size_id=variants[0].size_id)
-            sizes = Variants.objects.raw('SELECT * FROM product_variants WHERE product_id = %s GROUP BY size_id', [id])
-            variant = Variants.objects.get(id=variants[0].id)
-            context.update({'sizes': sizes, 'colors': colors, 'variant': variant, 'query': query})
-
-        return render(request, self.template_name, context)
-
-    def post(self, request, id, slug):
-        query = request.GET.get('q')
-        defaultlang = settings.LANGUAGE_CODE[0:2]
-        currentlang = request.LANGUAGE_CODE[0:2]
-        category = Category.objects.all()
-        product = get_object_or_404(Item, pk=id)
-
-        if defaultlang != currentlang:
-            try:
-                prolang = Item.objects.raw(
-                    'SELECT p.id, p.price, p.amount, p.image, p.variant, l.title, l.keywords, l.description, l.slug, l.detail '
-                    'FROM product_product as p '
-                    'INNER JOIN product_productlang as l '
-                    'ON p.id = l.product_id '
-                    'WHERE p.id = %s and l.lang = %s', [id, currentlang])
-                product = prolang[0]
-            except:
-                pass
-
-        images = Images.objects.filter(product_id=id)
-        comments = Comment.objects.filter(product_id=id, status='True')
-        context = {'product': product, 'category': category, 'images': images, 'comments': comments}
-
-        if product.variant != "None":
-            variant_id = request.POST.get('variantid')
-            variant = Variants.objects.get(id=variant_id)
-            colors = Variants.objects.filter(product_id=id, size_id=variant.size_id)
-            sizes = Variants.objects.raw('SELECT * FROM product_variants WHERE product_id = %s GROUP BY size_id', [id])
-            query += variant.title + ' Size: ' + str(variant.size) + ' Color: ' + str(variant.color)
-            context.update({'sizes': sizes, 'colors': colors, 'variant': variant, 'query': query})
-
-        return render(request, self.template_name, context)
 
 class AjaxColorView(View):
     def post(self, request, *args, **kwargs):
@@ -319,22 +271,7 @@ class ProductListView(View):
 
     def get(self, request):
         items = Item.objects.all()
-        return render(request, self.template_name, {'product_list': items})
-
-    def post(self, request):
-        search_query = request.POST.get('search', '')
-        items = Item.objects.filter(name__icontains=search_query)
-        return render(request, self.template_name, {'product_list': items})
-    
-
-class UserProductListView(LoginRequiredMixin, ListView):
-    model = Item
-    template_name = 'user_products.html'
-    context_object_name = 'product_list'  # Ensure the context variable is the same as in the template
-    login_url = 'login'  # URL to redirect to when the user is not logged in
-
-    def get_queryset(self):
-        return Item.objects.filter(created_by=self.request.user)
+        return render(request, self.template_name, {'items': items})
 
 
 class OrderSummary(LoginRequiredMixin, View):

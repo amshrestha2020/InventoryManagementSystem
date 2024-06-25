@@ -4,7 +4,6 @@ from django.shortcuts import render
 import operator
 from functools import reduce
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
     DetailView,
@@ -27,11 +26,13 @@ from store.forms import ProductForm
 from store.tables import ItemTable
 from django.contrib import messages
 from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 
 
 @login_required
+@user_passes_test(lambda u: u.is_superuser)
 def dashboard(request):
     profiles =  Profile.objects.all()
     Category.objects.annotate(nitem=Count('item'))

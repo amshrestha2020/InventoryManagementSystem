@@ -7,10 +7,7 @@ from imagekit.processors import ResizeToFill
 from phonenumber_field.modelfields import PhoneNumberField
 from django_extensions.db.fields import AutoSlugField
 from ckeditor_uploader.fields import RichTextUploadingField
-from django.forms import ModelForm, TextInput, Textarea
 from currencies.models import Currency
-
-from django.utils.safestring import mark_safe
 
 
 STATUS_CHOICES = [
@@ -66,8 +63,7 @@ class Profile(models.Model):
         return url
 
     def __str__(self):
-        return f'{self.user.username} Profile'
-
+        return self.user.username
     class Meta:
         ordering = ["slug"]
 
