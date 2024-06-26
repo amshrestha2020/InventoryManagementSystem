@@ -125,17 +125,12 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('products_list')
 
-    def test_func(self):
-        #item = Item.objects.get(id=pk)
-        if self.request.POST.get("quantity") < 1:
-            return False
-        else:
-            return True
 
 class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Item
     template_name = 'products_update.html'
-    fields = ['name','category','quantity','selling_price', 'expiring_date', 'vendor']
+    fields = ['item_name','item_category','price', 'discount_price', 'item_image', 'labels', 
+              'slug', 'likes', 'description', 'color', 'size', 'type', 'quantity', 'materials']
     
 
     def form_valid(self, form):

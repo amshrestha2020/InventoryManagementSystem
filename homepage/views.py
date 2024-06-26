@@ -4,8 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView, ListView, FormView, View, DetailView
 from django.conf import settings
 from .models import Setting, SettingLang, ContactMessage
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
-from django.utils import translation
+from django.http import JsonResponse
 from django.views import View
 from django.views.generic.edit import FormView
 from django.contrib import messages
@@ -16,63 +15,15 @@ import json
 from .forms import SearchForm
 from accounts.forms import ContactForm
 from accounts.models import Language, FAQ, Profile
-from store.models import Item, Category, Images, Comment, Variants, Cart
+from store.models import Item, Category, Images, Comment, Variants, Cart, OrderItem
+from django.utils import timezone
 
 from django.template.loader import render_to_string
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.urls import reverse
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.decorators import login_required
 
 from django.db.models import Q
 
-
-# class IndexView(TemplateView):
-#     template_name = 'home.html'
-
-#     def get(self, request, *args, **kwargs):
-#         if not request.session.has_key('currency'):
-#             request.session['currency'] = settings.DEFAULT_CURRENCY
-
-#         try:
-#             setting = Setting.objects.get(pk=1)
-#         except Setting.DoesNotExist:
-#             setting = None
-
-#         products_latest = Item.objects.all().order_by('-id')[:4]
-
-#         defaultlang = settings.LANGUAGE_CODE[0:2]
-#         currentlang = request.LANGUAGE_CODE[0:2]
-
-#         if defaultlang != currentlang:
-#             setting = SettingLang.objects.get(lang=currentlang)
-#             products_latest = Item.objects.raw(
-#                 'SELECT p.id, p.price, l.title, l.description, l.slug '
-#                 'FROM product_product as p '
-#                 'LEFT JOIN product_productlang as l '
-#                 'ON p.id = l.product_id '
-#                 'WHERE l.lang=%s ORDER BY p.id DESC LIMIT 4', [currentlang])
-
-#         products_slider = Item.objects.all().order_by('id')[:4]
-#         products_picked = Item.objects.all().order_by('?')[:4]
-
-#         page = "home"
-#         context = {
-#             'setting': setting,
-#             'page': page,
-#             'products_slider': products_slider,
-#             'products_latest': products_latest,
-#             'products_picked': products_picked,
-#         }
-
-#         if request.user.is_authenticated:
-#             if request.user.is_superuser:
-#                 return redirect('dashboard')
-#             else:
-#                 return self.render_to_response(context)
-#         else:
-#             return self.render_to_response(context)
 
 def Base(request):
     user = request.user
@@ -279,7 +230,7 @@ class OrderSummary(LoginRequiredMixin, View):
         try:
             order = Cart.objects.get(user=self.request.user, ordered=False)
             if order.items.count() == 0:
-                return redirect("item_list")  # Redirect to item list if cart is empty
+                return redirect("product_list")  # Redirect to item list if cart is empty
             context = {
                 'object': order
             }
@@ -287,3 +238,87 @@ class OrderSummary(LoginRequiredMixin, View):
         except ObjectDoesNotExist:
             # Handle the case where the cart does not exist for the user
             return redirect("/")  # Redirect to home page if cart does not exist
+        
+
+
+@login_required
+def add_to_cart(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+
+    ordered_item, is_created = OrderItem.objects.get_or_create(
+        user=request.user,
+        item=item,
+        ordered=False
+    )
+    user_cart = Cart.objects.filter(user=request.user, ordered=False)
+    if user_cart.exists():
+        user_order = user_cart[0]
+        filtered_user_cart_by_the_ordered_item = user_order.items.filter(item__slug=item.slug)
+        if filtered_user_cart_by_the_ordered_item.exists():
+            ordered_item.quantity += 1
+            ordered_item.save()
+            messages.info(request, "The quantity was updated")
+        else:
+            user_order.items.add(ordered_item)
+    # If user does not have any item in the cart create the new instance in the Order model
+    else:
+        new_order = Cart.objects.create(
+            user=request.user,
+            ordered_date=timezone.now(),
+        )
+        new_order.items.add(ordered_item)
+        messages.info(request, "The item was added to the cart")
+    return redirect("order_summary")
+
+
+
+
+@login_required
+def remove_from_the_cart(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    order_qs = Cart.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
+        if order.items.filter(item__slug=item.slug).exists():
+            order_item = OrderItem.objects.filter(
+                item=item,
+                user=request.user,
+                ordered=False
+            )[0]
+            order.items.remove(order_item)
+            order_item.delete()
+            messages.info(request, "This item was removed from your cart")
+        else:
+            messages.info(request, "This item is not in your cart")
+            return redirect("product_detail", slug=slug)
+    else:
+        messages.info(request, "You have no order existed")
+        return redirect("product_detail", slug=slug)
+    return redirect("order_summary")
+
+
+@login_required
+def remove_single_from_the_cart(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    order_qs = Cart.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
+        if order.items.filter(item__slug=item.slug).exists():
+            order_item = OrderItem.objects.filter(
+                item=item,
+                user=request.user,
+                ordered=False
+            )[0]
+            if order_item.quantity == 1:
+                order.items.remove(order_item)
+                order_item.delete()
+            else:
+                order_item.quantity -= 1
+                order_item.save()
+            messages.info(request, "This quantity was updated")
+        else:
+            messages.info(request, "This item is not in your cart")
+    else:
+        messages.info(request, "You have no order existed")
+        return redirect("order_summary")
+    return redirect("order_summary")

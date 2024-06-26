@@ -1,170 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        {% load static %}
-        <link rel="stylesheet" href="{% static 'fontawesome/css/all.css' %}" type="text/css">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="https://unpkg.com/@webpixels/css@1.1.5/dist/index.css">
-        <link rel="stylesheet" href="{% static 'css/main.css' %}" type="text/css">
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}" type="text/css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"> </script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.css' %}" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@webpixels/css@1.1.5/dist/index.css">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
 
-        <title>IMS: {% block title %} {% endblock title %}</title>
-    </head>
-    <body>
-        <style>
-            .paginator {
-                display: flex;
-                justify-content: center;
-            }
+    <title>IMS: {% block title %} {% endblock title %}</title>
+</head>
+<body>
+    <style>
+        .paginator {
+            display: flex;
+            justify-content: center;
+        }
 
-            .custom-swal {
-                width: 300px;
-                height: auto;
-                padding: 20px;
-                background-color: #ffffff;
-                border-radius: 10px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                text-align: center;
-                margin: 0 auto;
-            }
+        .custom-swal {
+            width: 300px;
+            height: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 0 auto;
+        }
 
-            .swal-title {
-                font-size: 18px;
-                font-weight: 600;
-                margin-bottom: 10px;
-            }
+        .swal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
 
-            .swal-text {
-                font-size: 14px;
-                margin-bottom: 20px;
-            }
+        .swal-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
 
-            .swal-button {
-                background-color: #007bff;
-                color: #ffffff;
-                border: none;
-                padding: 10px 20px;
-                font-size: 14px;
-                border-radius: 5px;
-                cursor: pointer;
-            }
+        .swal-button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-            .swal-button:hover {
-                background-color: #0056b3;
-            }
+        .swal-button:hover {
+            background-color: #0056b3;
+        }
 
-
-            .navbar-nav .nav-link {
-                color: white !important;
-            }
-        
-            .navbar-nav .nav-link:hover {
-                color: #ffeb3b !important; /* Change to your preferred hover color */
-            }
-        
-            .navbar-brand {
-                color: white !important;
-            }
-        
-            .navbar-toggler {
-                border-color: rgba(255, 255, 255, 0.1);
-            }
-        
-            .navbar-toggler .fa-bars {
-                color: white;
-            }
-        
+        .navbar-nav .nav-link {
+            color: white !important;
+        }
+    
+        .navbar-nav .nav-link:hover {
+            color: lightblue !important; /* Change hover color to light blue */
+        }
+    
+        .navbar-brand {
+            color: white !important;
+        }
+    
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+    
+        .navbar-toggler .fa-bars {
+            color: white;
+        }
+    
+        .menu-header {
+            color: white;
+            display: none;
+        }
+    
+        @media (max-width: 768px) {
             .menu-header {
-                color: white;
+                display: block;
+                margin-right: auto;
+                padding: 0.5rem 1rem;
+            }
+    
+            .menu-list {
                 display: none;
             }
+        }
+    
+        .navbar-collapse {
+            justify-content: flex-end;
+        }
         
-            @media (max-width: 768px) {
-                .menu-header {
-                    display: block;
-                    margin-right: auto;
-                    padding: 0.5rem 1rem;
-                }
-        
-                .menu-list {
-                    display: none;
-                }
-            }
-        
-            .navbar-collapse {
-                justify-content: flex-end;
-            }
-            
-            .navbar-right {
-                margin-left: auto;
-            }
-        </style>
+        .navbar-right {
+            margin-left: auto;
+        }
 
-        {% include "sidebar.html" %}
-        <section id="wrapper">
-            <nav class="navbar navbar-expand-md bg-success">
-                <div class="container-fluid mx-2">
-                    <div class="navbar-header">
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#toggle-navbar" aria-controls="toggle-navbar" aria-expanded="false" aria-label="Toggle navigation">
-                            <i class="fa fa-bars text-white"></i>
-                        </button>
-                        <a class="navbar-brand" style="font-size: 20px;" href="{% url 'dashboard' %}">Inventory<span class="text-warning">ms</span></a>
-                    </div>
-                    
-                    <!-- Menu Nav -->
-                    <div class="collapse navbar-collapse" id="toggle-navbar">
-                        <ul class="navbar-nav navbar-right">  <!-- This line has been modified -->
-                            <li class="nav-item">
-                                <a class="nav-link text-white" href="#">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" href="#">About Us</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" href="#">Contact Us</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- menu nav -->
+        .user-profile {
+            position: relative;
+        }
+        
+        .user-profile .dropdown-menu {
+            right: 0;
+            left: auto;
+        }
+    </style>
 
-                    <div class="collapse navbar-collapse" id="toggle-navbar">
-                        <ul class="navbar-nav ms-auto">
-                        </ul>
-                    </div>
+    <section id="wrapper">
+        <nav class="navbar navbar-expand-md bg-success">
+            <div class="container-fluid mx-2">
+                <div class="navbar-header">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#toggle-navbar" aria-controls="toggle-navbar" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fa fa-bars text-white"></i>
+                    </button>
+                    <a class="navbar-brand" style="font-size: 20px;" href="{% url 'dashboard' %}">Inventory<span class="text-warning">ms</span></a>
                 </div>
-            </nav>
-            {% block content %}
-                {% include "pagination.html" %}
-            {% endblock content %}
+                
+                <!-- Menu Nav -->
+                <div class="collapse navbar-collapse" id="toggle-navbar">
+                    <ul class="navbar-nav navbar-right">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'home' %}">Back to Homepage</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- menu nav -->
 
-        </section>
-         <script type="text/javascript" src="{% static 'js/dashboard.js'%}"></script>
-        <script type="text/javascript" src="{% static 'fontawesome/js/all.js' %}" crossorigin="anonymous"></script>
+                <div class="collapse navbar-collapse" id="toggle-navbar">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" id="adminProfileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Admin Profile
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminProfileDropdown">
+                                <a class="dropdown-item" href="{% url 'admin:password_change' %}">Change Password</a>
+                                <a class="dropdown-item" href="{% url 'admin:logout' %}">Logout</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </section>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"> </script>
-        <script>
-            // Display Django messages using SweetAlert
-            {% if messages %}
-                {% for message in messages %}
-                    swal({
-                        title: "{{ message.tags|capfirst }}",
-                        text: "{{ message }}",
-                        icon: "{{ message.tags }}",
-                        button: "OK",
-                        className: "custom-swal",
-                    });
-                {% endfor %}
-            {% endif %}
-        </script>
-    </body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                {% include "sidebar.html" %}
+            </div>
+            <div class="col-md-10">
+                {% block content %}
+                {% endblock content %}
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="{% static 'js/dashboard.js'%}"></script>
+    <script type="text/javascript" src="{% static 'fontawesome/js/all.js' %}" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
+    <script>
+        // Display Django messages using SweetAlert
+        {% if messages %}
+            {% for message in messages %}
+                swal({
+                    title: "{{ message.tags|capfirst }}",
+                    text: "{{ message }}",
+                    icon: "{{ message.tags }}",
+                    button: "OK",
+                    className: "custom-swal",
+                });
+            {% endfor %}
+        {% endif %}
+    </script>
+</body>
 </html>

@@ -14,19 +14,8 @@
                             <h1 class="text-success">Update product</h1>
                             <hr>
                         </header>
-                        <label>Product name</label>
-                        {{form.name}}
-                        <label> Category </label>
-                        {{form.category}}
-                        <label> Quantity </label>
-                        {{form.quantity}}
-                        <label> Selling Price</label>
-                        {{form.selling_price}}
-                        <label> Expiring date</label>
-                        <div class="input-group" id="datetimepicker1" data-target-input="nearest">
-                          {{form.expiring_date}}
-                          <label>Vendor</label>
-                          {{form.vendor}}
+                        {{ form.media }} {{ form|crispy }}
+
                     </fieldset>
                 </section>
                 <div class="form-group mt-4 text-center">

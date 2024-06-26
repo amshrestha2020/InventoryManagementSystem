@@ -7,7 +7,7 @@ class ItemTable(tables.Table):
     class Meta:
         model = Item
         template_name = "django_tables2/semantic.html"
-        fields = ('id', 'name','category', 'quantity', 'selling_price', 'expiring_date', 'vendor')
+        fields = ('id', 'item_name','item_category', 'price', 'item_image', 'description')
         order_by_field = 'sort'
 
 class DeliveryTable(tables.Table):
