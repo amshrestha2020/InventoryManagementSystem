@@ -57,6 +57,33 @@ ADDRESS_CHOICES = (
 )
 
 
+
+COLOR_CHOICES = [
+        ('BR', 'Brown'),
+        ('BK', 'Black'),
+        ('BL', 'Blue'),
+        # Add more color choices as needed
+    ]
+
+SIZE_CHOICES = [
+    ('S', 'Small'),
+    ('M', 'Medium'),
+    ('L', 'Large'),
+    # Add more size choices as needed
+]
+
+TYPE_CHOICES = [
+    ('R', 'Regular'),
+    ('S', 'Slim'),
+    # Add more type choices as needed
+]
+
+MATERIAL_CHOICES = [
+    ('C', 'Cotton'),
+    ('J', 'Jeans'),
+    # Add more material choices as needed
+]
+
 class Item(models.Model):
     item_name = models.CharField(max_length=100)
     item_category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -67,6 +94,13 @@ class Item(models.Model):
     slug = models.SlugField(unique=True)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     description = models.TextField()
+
+    color = models.CharField(choices=COLOR_CHOICES, max_length=2, blank=True, null=True)
+    size = models.CharField(choices=SIZE_CHOICES, max_length=1, blank=True, null=True)
+    type = models.CharField(choices=TYPE_CHOICES, max_length=1, blank=True, null=True)
+    quantity = models.PositiveIntegerField(default=1)
+    materials = models.CharField(choices=MATERIAL_CHOICES, max_length=1, blank=True, null=True)
+
 
     def __str__(self):
         return self.item_name

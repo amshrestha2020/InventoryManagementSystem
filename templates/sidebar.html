@@ -1,83 +1,96 @@
 {% load static %}
-<style>
-  .btn-logout {
-      background-color: #dc3545;
-      border-color: #dc3545;
-      padding: 0.375rem 0.75rem;
-      font-size: 1rem;
-      line-height: 1.5;
-      border-radius: 0.25rem;
-      transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  }
-  
-  .btn-logout:hover {
-      background-color: #c82333;
-      border-color: #bd2130;
-  }
 
-  .btn-logout, .btn-logout i, .btn-logout:hover, .btn-logout:hover i {
-    color: #fff; /* This will make the text and icon color white */
-}
-</style>
-
-<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
-<aside class="sidebar position-fixed top-0 left-0 overflow-auto h-100 float-left" id="show-side-navigation1">
-    <i class="fa fa-bars close-aside d-md-none d-lg-none" data-close="show-side-navigation1"></i>
-    <div class="sidebar-header d-flex justify-content-center align-items-center px-3 py-4">
-      <a href="{% url 'user_profile' %}">
-        <img
-          class="rounded-pill img-fluid"
-          id = "sidebar-img"
-          width="65"
-          src="{{request.user.profile.profile_picture.url}}"
-          alt="">
-        </a>
-        <div class="ms-2">
-          <h5 class="fs-6 mb-0 text-white">{{user.username}}{% if user.profile.role == 'AD' %} <i class="fa-solid fa-circle-check"></i>{% endif %}</h5>
-          <span class="badge badge-pill bg-soft-success text-success me-2">
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px;">
+    <a href="{% url 'user_profile' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
+        <img class="rounded-pill img-fluid" id="sidebar-img" width="65" src="{{ request.user.profile.profile_picture.url }}" alt="">
+    </a>
+    <div class="ms-2">
+        <h5 class="fs-6 mb-0 text-white">{{ user.username }}{% if user.profile.role == 'AD' %} <i class="fa-solid fa-circle-check"></i>{% endif %}</h5>
+        <span class="badge badge-pill bg-soft-success text-success me-2">
             {% if user.profile.role == 'AD' %}
-              Admin
+                Admin
             {% elif user.profile.role == 'EX' %}
-              Executive
+                Executive
             {% else %}
-              Operative
-        {% endif %}
-          </span>
-        </div>
+                Operative
+            {% endif %}
+        </span>
     </div>
-    <ul class="categories list-unstyled">
-      <li>
-        <i class="fa fa-home fa-fw"></i><a href="{% url 'dashboard' %}"> Dashboard</a>
-      </li>
-      <li class="">
-        <i class="fa fa-folder"></i><a href="{% url "products_list" %}"> Products</a>
-      </li>
-      <li>
-        <i  class="fa fa-shopping-bag fa-fw"></i><a href="{% url 'sales_list' %}"> Sales Orders</a>
-      </li>
-      <li>
-        <i class="fa fa-shopping-cart"></i><a href="{% url "purchase_list"%}"> Purchase Orders</a>
-      </li>
-      <li>
-        <i class="fas fa-box"></i><a href="{% url "deliveries" %}"> Package</a>
-      </li>
-      <li>
-        <i class="fas fa-receipt"></i><a href="{% url "invoice_list" %}"> Invoices</a>
-      </li>
-      <li>
-        <i class="fas fa-money-bill-wave"></i><a href="{% url "bill_list" %}"> Bills</a>
-      </li>
-      <li>
-        <i class="fas fa-truck"></i><a href="{% url 'vendor' %}"> Vendors</a>
-      </li>
-      <li>
-        <i class="fas fa-users"></i><a href="{% url 'customer_list' %}"> Customers</a>
-      </li>
-      <li>
-        <i class="fas fa-users"></i><a href="{% url "profile_list" %}"> Staff</a>
-      </li>
-      <li class="">
-        <a class="btn btn-outline-danger" href="{% url "user_logout" %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-      </li>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="{% url 'dashboard' %}" class="nav-link active" aria-current="page">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'products_list' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
+                Products
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'sales_list' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
+                Sales Orders
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'purchase_list' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
+                Purchase Orders
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'deliveries' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
+                Package
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'invoice_list' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
+                Invoices
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'bill_list' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
+                Bills
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'vendor' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
+                Vendors
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'customer_list' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
+                Customers
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'profile_list' %}" class="nav-link link-dark">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
+                Staff
+            </a>
+        </li>
     </ul>
-  </aside>
+    <hr>
+    <div class="dropdown">
+        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong>mdo</strong>
+        </a>
+        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'user_logout' %}">Sign out</a></li>
+        </ul>
+    </div>
+</div>
