@@ -19,11 +19,13 @@
                 </li>
             </ul>
             <form class="d-flex">
+                <a href="{% url "order_summary" %}">
                 <button class="btn btn-outline-dark" type="submit">
                     <i class="bi-cart-fill me-1"></i>
                     Cart
-                    <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                    <span class="badge bg-dark text-white ms-1 rounded-pill">{{ total_items }}</span>
                 </button>
+                </a>
                 <a href="/accounts/login/" class="btn btn-outline-dark ms-2">Login</a>
                 <a href="/accounts/signup/" class="btn btn-outline-dark ms-2">Sign Up</a>
             </form>
@@ -43,11 +45,13 @@
                 <li class="nav-item"><a class="nav-link" href="{% url "admin_dashboard" %}">Dashboard</a></li>
             </ul>
             <form class="d-flex">
+                <a href="{% url "order_summary" %}">
                 <button class="btn btn-outline-dark" type="submit">
                     <i class="bi-cart-fill me-1"></i>
                     Cart
-                    <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                    <span class="badge bg-dark text-white ms-1 rounded-pill">{{ total_items }}</span>
                 </button>
+                </a>
                 <a href="/accounts/password/change/" class="btn btn-outline-dark ms-2">Reset Password</a>
                 <a href="/request_refund/" class="btn btn-outline-dark ms-2">Request Refund</a>
                 <a href="/accounts/logout/" class="btn btn-outline-dark ms-2">Logout</a>

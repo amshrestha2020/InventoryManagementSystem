@@ -1,0 +1,134 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <!-- Selected Items Section -->
+            <div class="col-md-6">
+                <h2>Selected Items</h2>
+                <ul>
+                    {% for item in order_items %}
+                    <li>{{ item.item.item_name }} - ${{ item.item.price }} x {{ item.quantity }} = ${{ item.get_total_price }}</li>
+                    {% endfor %}
+                </ul>
+                <p>Discount: ${{ discount }}</p>
+                <form method="post" action="{% url 'apply_promo_code' %}">
+                    {% csrf_token %}
+                    <label for="promo_code">Promo Code:</label>
+                    <input type="text" id="promo_code" name="promo_code">
+                    <button type="submit">Apply</button>
+                </form>
+                <h3>Total: ${{ total_price }}</h3>
+            </div>
+
+            <!-- Payment Form Section -->
+            <div class="col-md-6">
+                <h2>Payment Details</h2>
+                <form method="post" action="{% url 'process_payment' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Shipping Address -->
+                    <h3>Shipping Address</h3>
+                    <div class="form-group">
+                        <label for="shipping_address1">Address Line 1:</label>
+                        <input type="text" id="shipping_address1" name="shipping_address1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipping_address2">Address Line 2:</label>
+                        <input type="text" id="shipping_address2" name="shipping_address2">
+                    </div>
+                    <div class="form-group">
+                        <label for="shipping_city">City:</label>
+                        <input type="text" id="shipping_city" name="shipping_city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipping_zip">Zip Code:</label>
+                        <input type="text" id="shipping_zip" name="shipping_zip" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipping_country">Country:</label>
+                        <input type="text" id="shipping_country" name="shipping_country" required>
+                    </div>
+                    
+                    <!-- Billing Address -->
+                    <h3>Billing Address</h3>
+                    <div class="form-group">
+                        <label for="billing_address1">Address Line 1:</label>
+                        <input type="text" id="billing_address1" name="billing_address1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="billing_address2">Address Line 2:</label>
+                        <input type="text" id="billing_address2" name="billing_address2">
+                    </div>
+                    <div class="form-group">
+                        <label for="billing_city">City:</label>
+                        <input type="text" id="billing_city" name="billing_city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="billing_zip">Zip Code:</label>
+                        <input type="text" id="billing_zip" name="billing_zip" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="billing_country">Country:</label>
+                        <input type="text" id="billing_country" name="billing_country" required>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <h3>Payment Method</h3>
+                    <div class="form-group">
+                        <input type="radio" id="payment_cash" name="payment_method" value="cash" required>
+                        <label for="payment_cash">Cash</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="radio" id="payment_credit" name="payment_method" value="credit" required>
+                        <label for="payment_credit">Credit Card</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="radio" id="payment_online" name="payment_method" value="online" required>
+                        <label for="payment_online">Online Transaction</label>
+                    </div>
+
+                    <!-- Credit Card Details -->
+                    <div id="credit_card_details" style="display:none;">
+                        <h3>Credit Card Details</h3>
+                        <div class="form-group">
+                            <label for="card_number">Card Number:</label>
+                            <input type="text" id="card_number" name="card_number">
+                        </div>
+                        <div class="form-group">
+                            <label for="card_expiry">Expiry Date:</label>
+                            <input type="text" id="card_expiry" name="card_expiry">
+                        </div>
+                        <div class="form-group">
+                            <label for="card_cvc">CVC:</label>
+                            <input type="text" id="card_cvc" name="card_cvc">
+                        </div>
+                    </div>
+
+                    <button type="submit">Confirm and Pay</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('payment_credit').addEventListener('change', function() {
+            document.getElementById('credit_card_details').style.display = 'block';
+        });
+        document.getElementById('payment_cash').addEventListener('change', function() {
+            document.getElementById('credit_card_details').style.display = 'none';
+        });
+        document.getElementById('payment_online').addEventListener('change', function() {
+            document.getElementById('credit_card_details').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

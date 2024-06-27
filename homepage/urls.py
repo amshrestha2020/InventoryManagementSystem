@@ -4,11 +4,7 @@ from .views import (
                     SearchAutoView, 
                     SearchView, 
                     AjaxColorView, 
-                    FaqView,
-                    AddToCartView,
-                    add_to_cart,
-                    remove_from_the_cart,
-                    remove_single_from_the_cart )
+                    FaqView, )
 
 app_name = 'homepage'
 
