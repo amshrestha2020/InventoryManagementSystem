@@ -36,15 +36,23 @@ def Base(request):
             quantity = 0
             for item in cartitem:
                 quantity += item.quantity
+            
+            # Count total items in the order
+            ordered = OrderItem.objects.filter(user=request.user, ordered=False).first()
+            if ordered:
+                total_items = ordered.item.count()
+            else:
+                total_items = 0
 
-            return render(request, 'base.html', {'products': product, 'quantity': quantity})
+
+            return render(request, 'base.html', {'products': product, 'quantity': quantity, 'total_items': total_items})
         
         except Cart.DoesNotExist:
             # Handle the case where the cart does not exist
-            return render(request, 'base.html', {'products': product, 'quantity': 0})
+            return render(request, 'base.html', {'products': product, 'quantity': 0, total_items: 0})
     
     else:
-        return render(request, 'base.html', {'products': product})
+        return render(request, 'base.html', {'products': product, 'total_items': 0})
     
 
 class HomeView(ListView):
@@ -57,22 +65,33 @@ class HomeView(ListView):
         queryset = Item.objects.all()
         category = self.kwargs.get('category_name')
         search_by = self.request.GET.get('key')
-        # Return queryset filtered by the category
+        
         if category:
             queryset = queryset.filter(item_category__category=category)
+        
         if search_by:
             queryset = queryset.filter(
                 Q(item_category__category__icontains=search_by) |
                 Q(item_name__icontains=search_by)
             )
+        
         return queryset.order_by('id')
     
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Retrieve user and check their active order
+        user = self.request.user
+        total_items = 0
+
+        # Add additional context variables
         host = self.request.get_host()
         categories = Category.objects.all()
+        
+        context['total_items'] = total_items
         context['categories'] = categories
         context['host'] = host
+        
         return context
     
 
@@ -237,7 +256,7 @@ class OrderSummary(LoginRequiredMixin, View):
             return render(self.request, 'order_summary.html', context)
         except ObjectDoesNotExist:
             # Handle the case where the cart does not exist for the user
-            return redirect("/")  # Redirect to home page if cart does not exist
+            return redirect("home")  # Redirect to home page if cart does not exist
         
 
 
