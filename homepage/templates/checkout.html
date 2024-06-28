@@ -1,0 +1,103 @@
+{% extends 'main.html' %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<main>
+  <div class="container wow fadeIn">
+    <h2 class="my-5 h2 text-center">Checkout Form</h2>
+    <div class="row justify-content-center">
+      <!-- Checkout Form -->
+      <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0 rounded">
+          <div class="card-body p-4">
+            <form method="POST" class="form-stylish">
+              {% csrf_token %}
+
+              <!-- Shipping Information -->
+              <h3 class="mb-4 text-center">Shipping Address</h3>
+              <div class="hideable_shipping_form">
+                {{ form.shipping_address|as_crispy_field }}
+                {{ form.shipping_address2|as_crispy_field }}
+                <div class="row">
+                  <div class="col-lg-6 col-md-12 mb-3">
+                    {{ form.shipping_country|as_crispy_field }}
+                  </div>
+                  <div class="col-lg-6 col-md-6 mb-3">
+                    {{ form.shipping_zip|as_crispy_field }}
+                  </div>
+                </div>
+                {{ form.same_billing_address|as_crispy_field }}
+                {{ form.set_default_shipping|as_crispy_field }}
+              </div>
+              {% if default_shipping_address %}
+              {{ form.use_default_shipping|as_crispy_field }}
+              {% endif %}
+
+              <hr class="my-4">
+
+              <!-- Billing Information -->
+              <h3 class="mb-4 text-center">Billing Address</h3>
+              <div class="hideable_billing_form">
+                {{ form.billing_address|as_crispy_field }}
+                {{ form.billing_address2|as_crispy_field }}
+                <div class="row">
+                  <div class="col-lg-6 col-md-12 mb-3">
+                    {{ form.billing_country|as_crispy_field }}
+                  </div>
+                  <div class="col-lg-6 col-md-6 mb-3">
+                    {{ form.billing_zip|as_crispy_field }}
+                  </div>
+                </div>
+                {{ form.set_default_billing|as_crispy_field }}
+              </div>
+              {% if default_billing_address %}
+              {{ form.use_default_billing|as_crispy_field }}
+              {% endif %}
+
+              <hr class="my-4">
+
+              <!-- Payment Information -->
+              <h3 class="mb-4 text-center">Payment Option</h3>
+              <div class="d-block my-3">
+                {% for value, name in form.fields.payment_option.choices %}
+                <div class="form-check mb-3">
+                  <input id="{{ name }}" name="payment_option" value="{{ value }}" type="radio" class="form-check-input" required>
+                  <label class="form-check-label" for="{{ name }}">{{ name }}</label>
+                </div>
+                {% endfor %}
+              </div>
+
+              <button class="btn btn-primary btn-lg btn-block mt-4" type="submit">Continue to Checkout</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Summary -->
+      <div class="col-md-4 mb-4">
+        {% include "order_snippet.html" %}
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const hideableShippingForm = document.querySelector('.hideable_shipping_form');
+  const hideableBillingForm = document.querySelector('.hideable_billing_form');
+  const useDefaultShipping = document.querySelector('input[name=use_default_shipping]');
+  const useDefaultBilling = document.querySelector('input[name=use_default_billing]');
+  const sameBillingAddress = document.querySelector('input[name=same_billing_address]');
+
+  function toggleVisibility(checkbox, form) {
+    checkbox.addEventListener('change', function() {
+      form.style.display = this.checked ? 'none' : 'block';
+    });
+  }
+
+  if (useDefaultShipping) toggleVisibility(useDefaultShipping, hideableShippingForm);
+  if (useDefaultBilling) toggleVisibility(useDefaultBilling, hideableBillingForm);
+  if (sameBillingAddress) toggleVisibility(sameBillingAddress, hideableBillingForm);
+</script>
+{% endblock %}
