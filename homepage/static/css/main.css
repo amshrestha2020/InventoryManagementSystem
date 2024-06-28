@@ -1,0 +1,114 @@
+        body {
+            margin-top: 20px;
+            background-color: #f1f3f7;
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin-bottom: 40px; /* Space between footer and content */
+        }
+
+        .avatar-lg {
+            height: 5rem;
+            width: 5rem;
+            border-radius: 50%;
+        }
+
+        .font-size-18 {
+            font-size: 18px;
+        }
+
+        .text-truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card {
+            margin-bottom: 20px; /* Space between cards */
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #fff;
+            padding: 20px;
+        }
+
+        .card-header {
+            background-color: #f0f3f7;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 20px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .btn {
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .btn-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table td,
+        table th {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f0f3f7;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .bg-light {
+            background-color: #f0f3f7;
+        }
+
+        .order-summary {
+            margin-top: 20px;
+        }
+
+        .order-summary .btn {
+            margin-top: 10px;
+        }
+
+        /* Space between cards */
+        .card {
+            margin-bottom: 20px;
+        }
+
+        /* Space between footer and content */
+        footer {
+            margin-top: 40px;
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        /* Navigation bar styling */
+        nav {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }

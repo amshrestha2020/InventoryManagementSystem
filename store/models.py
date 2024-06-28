@@ -14,9 +14,17 @@ from accounts.models import Language
 from django.conf import settings
 from django_countries import countries
 from django_countries.fields import CountryField
+from django.db.models.signals import post_save
 
 
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    on_click_purchasing = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username
+    
 class Category(MPTTModel):
     STATUS = (
         ('True', 'True'),
@@ -129,7 +137,7 @@ class OrderItem(models.Model):
     ordered = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.quantity} of {self.item.name}"
+        return f"{self.quantity} of {self.item.item_name}"
 
     def get_total_price(self):
         return self.item.price * self.quantity
@@ -315,3 +323,14 @@ class Variants(models.Model):
              return mark_safe('<img src="{}" height="50"/>'.format(img.image.url))
         else:
             return ""
+
+
+
+
+def user_profile_receiver(sender, instance, created, *args, **kwargs):
+    if created:
+        user_profile = UserProfile.objects.create(user=instance)
+
+
+# Signal to create user profile every time a new user is created
+post_save.connect(user_profile_receiver, sender=settings.AUTH_USER_MODEL)
