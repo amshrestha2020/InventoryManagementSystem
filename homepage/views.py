@@ -96,6 +96,22 @@ class HomeView(ListView):
 class DashboardView(TemplateView):
     template_name = 'dashboard.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_pages'] = {
+            'dashboard': True,  # Example: 'dashboard' is active
+            'products_list': True,    # Example: 'orders' is inactive
+            'sales_list': True,   # Example: 'settings' is active
+            'purchase_list' : True,
+            'deliveries' : True,
+            'invoice_list' : True,
+            'bill_list' : True,
+            'vendor' : True,
+            'customer_list' : True,
+            'profile_list' : True
+        }
+        return context
+
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
@@ -516,7 +532,8 @@ class PaymentView(LoginRequiredMixin, View):
             return redirect('ssl_payment')
         try:
             order = Cart.objects.get(user=self.request.user, ordered=False)
-            user_profile = self.request.user.userprofile
+
+            userprofile = UserProfile.objects.get(user=self.request.user)
             if order.items.count() == 0:
                 messages.info(self.request, "No item in your cart")
                 return redirect("main")
@@ -533,7 +550,7 @@ class PaymentView(LoginRequiredMixin, View):
                 return redirect("checkout")
         except ObjectDoesNotExist:
             messages.error(self.request, "You have no active order")
-            return redirect("main")
+            return redirect("payment")
 
     def post(self, *args, **kwargs):
         try:

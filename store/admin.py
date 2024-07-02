@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from store.models import Category, Delivery, Item, Cart, OrderItem, Refund, Address, Payment, Coupon
+from store.models import Category, Delivery, Item, Cart, OrderItem, Refund, Address, Payment, Coupon, UserProfile
 
 
 admin.site.register(Category)
@@ -10,6 +10,7 @@ admin.site.register(Item)
 admin.site.register(Address)
 admin.site.register(Payment)
 admin.site.register(Coupon)
+admin.site.register(UserProfile)
 
 
 

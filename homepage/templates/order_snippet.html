@@ -28,7 +28,7 @@
     </li>
     </ul>
   
-    {% if DISPLAY_COUPON_FORM %}
+    {% comment %} {% if DISPLAY_COUPON_FORM %}
     <form class="card p-2" action="{% url 'add_coupon' %}" method="POST">
         <p>Promo Code = Django</p>
         {% csrf_token %}
@@ -39,6 +39,6 @@
             </div>
         </div>
     </form>
-    {% endif %}
+    {% endif %} {% endcomment %}
   
   </div>
