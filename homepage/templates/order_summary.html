@@ -88,8 +88,11 @@
 
                 <div class="col-xl-4 order-summary">
                     <div class="card">
+                        {% for order_item in object.items.all %}
                         <div class="card-header">
-                            <h5 class="font-size-16 mb-0">Order Summary <span class="float-end">#{{ object.order_number }}</span></h5>
+                            {% if order_item.item.item_name %}
+                            <h5 class="font-size-16 mb-0">Order Summary <span class="float-end">#{{ object.items.all }}</span></h5>
+                            {% endif %}
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -97,11 +100,15 @@
                                     <tbody>
                                         <tr>
                                             <td>Sub Total :</td>
+                                            {% if order_item.item.discount_price %}
                                             <td class="text-end">$ {{ object.get_total_price }}</td>
+                                            {% endif %}
                                         </tr>
                                         <tr>
                                             <td>Discount : </td>
+                                            {% if order_item.item.discount_price %}
                                             <td class="text-end">- $ {{ object.get_total_discount_price }}</td>
+                                            {% endif %}
                                         </tr>
                                         <tr>
                                             <td>Shipping Charge :</td>
@@ -113,9 +120,11 @@
                                         </tr>
                                         <tr class="bg-light">
                                             <th>Total :</th>
+                                            {% if order_item.item.discount_price %}
                                             <td class="text-end">
                                                 <span class="fw-bold">$ {{ object.get_final_price }}</span>
                                             </td>
+                                            {% endif %}
                                         </tr>
                                     </tbody>
                                 </table>
@@ -130,6 +139,7 @@
                                 </a>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
                 </div>
 

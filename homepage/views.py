@@ -17,7 +17,9 @@ import json
 from .forms import SearchForm, CheckoutForm, CouponForm
 from accounts.forms import ContactForm
 from accounts.models import Language, FAQ, Profile
-from store.models import Item, Category, Images, Comment, Variants, Cart, OrderItem, Address, Coupon, Payment, UserProfile
+from store.models import Item, Category, Images, Comment, Variants, Cart, OrderItem, Address, Coupon, Payment, UserProfile, Refund
+from homepage.forms import RefundForm
+
 from django.utils import timezone
 
 from django.template.loader import render_to_string
@@ -25,6 +27,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 
 from django.db.models import Q
+import stripe
 
 
 def Base(request):
@@ -246,14 +249,14 @@ class OrderSummary(LoginRequiredMixin, View):
         try:
             order = Cart.objects.get(user=self.request.user, ordered=False)
             if order.items.count() == 0:
-                return redirect("product_list")  # Redirect to item list if cart is empty
+                return redirect("items")  # Redirect to item list if cart is empty
             context = {
                 'object': order
             }
             return render(self.request, 'order_summary.html', context)
         except ObjectDoesNotExist:
             # Handle the case where the cart does not exist for the user
-            return redirect("home")  # Redirect to home page if cart does not exist
+            return redirect("/")  # Redirect to home page if cart does not exist
         
 
 
@@ -519,7 +522,7 @@ class PaymentView(LoginRequiredMixin, View):
             user_profile = self.request.user.userprofile
             if order.items.count() == 0:
                 messages.info(self.request, "No item in your cart")
-                return redirect("main")
+                return redirect("item_list")
             if order.billing_address:
                 context = {
                     "orders": order,
@@ -527,52 +530,169 @@ class PaymentView(LoginRequiredMixin, View):
                     'DISPLAY_COUPON_FORM': False
                 }
                 
+                if user_profile.on_click_purchasing:
+                    card_list = stripe.Customer.list_sources(
+                        user_profile.stripe_customer_id,
+                        limit=3,
+                        object="card"
+                    )
+                    cards = card_list['data']
+                    if len(cards) > 0:
+                        context.update({
+                            "card": cards[0]
+                        })
                 return render(self.request, 'payment.html', context)
             else:
                 messages.warning(self.request, "You have not added a billing address")
                 return redirect("checkout")
         except ObjectDoesNotExist:
             messages.error(self.request, "You have no active order")
-            return redirect("main")
+            return redirect("items")
 
     def post(self, *args, **kwargs):
+        order = Cart.objects.get(user=self.request.user, ordered=False)
+        userprofile = UserProfile.objects.get(user=self.request.user)
+        amount = int(order.get_total())
+        stripe_charge_token = self.request.POST.get('stripeToken')
+        save = self.request.POST.get('save')
+        user_default = self.request.POST.get('use_default')
+
+        # To do for if the user wants to save card information for future purpose or not
+        if save:
+            """
+            If user is not registered with stripe_customer_id Create the new customer instance
+            and store information to the UserProfile model
+            Otherwise retrieve the user information from the UserProfile model
+            Pass the already stored stripe_customer_id as the source value
+            To create a new source in the stripe db
+            """
+            if not userprofile.stripe_customer_id:
+                customer = stripe.Customer.create(
+                    email=str(self.request.user.email),
+                    name=self.request.user.username
+                )
+                customer.create(source=stripe_charge_token)
+                userprofile.stripe_customer_id = customer['id']
+                userprofile.on_click_purchasing = True
+                userprofile.save()
+            else:
+                customer = stripe.Customer.retrieve(
+                    userprofile.stripe_customer_id)
+                
+                customer.create(source=stripe_charge_token)
+
+        # To do for saving payment information
         try:
-            order = Cart.objects.get(user=self.request.user, ordered=False)
-            userprofile = UserProfile.objects.get(user=self.request.user)
-            amount = int(order.get_total())
+            """
+            If the user wants to use the previous default card retrieve the stripe_customer_id
+            from the UserProfile model and pass that to stripe api source to create charges
+            Otherwise create the charges using the token generated by stripe
+            """
+            if user_default or save:
+                charge = stripe.Charge.create(
+                    amount=amount*100,
+                    currency="usd",
+                    customer=userprofile.stripe_customer_id
+                )
+            else:
+                charge = stripe.Charge.create(
+                    amount=amount*100,
+                    currency="usd",
+                    source=stripe_charge_token
+                )
+            messages.success(self.request, "Stripe Payment Successful")
+            return redirect('complete_payment', tran_id=charge['id'], payment_type="S")
 
-            # Create a new payment object and mark it as paid by cash
-            payment = Payment(
-                user=self.request.user,
-                amount=amount,
-                payment_method="Cash",
-                timestamp=timezone.now()
-            )
-            payment.save()
+        except stripe.error.CardError as e:
+            body = e.json_body
+            err = body.get('error', {})
+            messages.warning(self.request, f"{err.get('message')}")
+            return redirect("payment", payment_option="Stripe")
 
-            # Assign the payment to the order and mark it as ordered
-            order.payment = payment
-            order.ordered = True
-            order.save()
+        except stripe.error.RateLimitError as e:
+            # Too many requests made to the API too quickly
+            messages.warning(self.request, "Rate limit error")
+            return redirect("payment", payment_option="Stripe")
 
-            # Clear the cart
-            for item in order.items.all():
-                item.ordered = True
-                item.save()
+        except stripe.error.InvalidRequestError as e:
+            # Invalid parameters were supplied to Stripe's API
+            messages.warning(self.request, "Invalid parameters")
+            return redirect("payment", payment_option="Stripe")
 
-            messages.success(self.request, "Your order was successful")
-            return redirect('complete_payment', tran_id=payment.id, payment_type="Cash")
+        except stripe.error.AuthenticationError as e:
+            # Authentication with Stripe's API failed
+            # (maybe you changed API keys recently)
+            messages.warning(self.request, "Not authenticated")
+            return redirect("payment", payment_option="Stripe")
 
-        except ObjectDoesNotExist:
-            messages.warning(self.request, "You have no active order")
-            return redirect("main")
+        except stripe.error.APIConnectionError as e:
+            # Network communication with Stripe failed
+            messages.warning(self.request, "Network error")
+            return redirect("payment", payment_option="Stripe")
+
+        except stripe.error.StripeError as e:
+            messages.warning(
+                self.request, "Something went wrong. You were not charged. Please try again.")
+            return redirect("payment", payment_option="Stripe")
 
         except Exception as e:
-            messages.error(self.request, "A serious error occurred. We have been notified.")
-            return redirect("payment", payment_option="Cash")
+            # Send an email to ourselves
+            messages.warning(
+                self.request, "A serious error occurred. We have been notified.")
+            return redirect("payment", payment_option="Stripe")
     
 
 
+class RequestRefundView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        orders = Cart.objects.filter(user=self.request.user, ordered=True)
+        if not orders.exists():
+            messages.info(self.request, "You have no orders yet, happy shopping !!")
+            return redirect('/')
+        refund_form = RefundForm()
+        context = {
+            "form": refund_form
+        }
+        return render(self.request, 'request_refund.html', context)
+
+    def post(self, *args, **kwargs):
+        refund_form = RefundForm(self.request.POST)
+        if refund_form.is_valid():
+            reference_code = refund_form.cleaned_data['reference_code']
+            try:
+                is_refund_already_granted = Cart.objects.filter(reference_code=reference_code, refund_granted=True)
+                is_refund_already_requested = Refund.objects.filter(reference_code=reference_code)
+                if is_refund_already_granted.exists():
+                    messages.info(self.request, "Already Refunded")
+                    return redirect('customer_profile')
+                elif is_refund_already_requested.exists():
+                    messages.info(self.request, "Refund already requested for this order")
+                    return redirect('customer_profile')
+                else:
+                    order = Cart.objects.get(reference_code=reference_code)
+                    order.refund_requested = True
+                    order.save()
+                    refund = Refund.objects.create(order=order, **refund_form.cleaned_data)
+                    refund.save()
+                    messages.info(self.request, "Your request was successful")
+                    return redirect("customer_profile")
+            except ObjectDoesNotExist:
+                messages.info(self.request, "No such order with that reference code")
+                return redirect("customer_profile")
+
+
+class CustomerProfileView(LoginRequiredMixin, View):
+    def get(self, slug, *args, **kwargs):
+        orders = Cart.objects.filter(user=self.request.user, ordered=True)
+        if orders.exists():
+            context = {
+                "orders": orders
+            }
+            return render(self.request, 'customer_profile.html', context)
+        else:
+            messages.info(self.request, "You have not yet ordered anything from our site")
+            return redirect("/")
+        
 
 @login_required
 def complete_payment(request, tran_id, payment_type):
@@ -592,6 +712,6 @@ def complete_payment(request, tran_id, payment_type):
     for order in users_order:
         order.ordered = True
         order.save()
-    return HttpResponseRedirect(reverse('checkout'))
+    return HttpResponseRedirect(reverse('items'))
 
 

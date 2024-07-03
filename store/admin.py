@@ -69,5 +69,13 @@ class RefundAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'order']
 
 
-admin.site.register(Refund, RefundAdmin)
 admin.site.register(Cart, CartAdmin)
+
+
+class RefundAdmin(admin.ModelAdmin):
+    class Meta:
+        model = Refund
+    list_display = ['__str__', 'order']
+
+
+admin.site.register(Refund, RefundAdmin)
