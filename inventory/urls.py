@@ -53,6 +53,9 @@ urlpatterns = [
 
     path('payment/<payment_option>/', PaymentView.as_view(), name="payment"),
     path('complete_payment/<tran_id>/<payment_type>/', complete_payment, name='complete_payment'),
+	
+
+    path('customer_profile/', CustomerProfileView.as_view(), name='customer_profile'),
 
 
 ]
