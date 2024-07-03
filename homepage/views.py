@@ -99,6 +99,22 @@ class HomeView(ListView):
 class DashboardView(TemplateView):
     template_name = 'dashboard.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_pages'] = {
+            'dashboard': True,  # Example: 'dashboard' is active
+            'products_list': True,    # Example: 'orders' is inactive
+            'sales_list': True,   # Example: 'settings' is active
+            'purchase_list' : True,
+            'deliveries' : True,
+            'invoice_list' : True,
+            'bill_list' : True,
+            'vendor' : True,
+            'customer_list' : True,
+            'profile_list' : True
+        }
+        return context
+
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
@@ -547,8 +563,8 @@ class PaymentView(LoginRequiredMixin, View):
                 return redirect("checkout")
         except ObjectDoesNotExist:
             messages.error(self.request, "You have no active order")
-            return redirect("items")
-
+            return redirect("payment")
+        
     def post(self, *args, **kwargs):
         order = Cart.objects.get(user=self.request.user, ordered=False)
         userprofile = UserProfile.objects.get(user=self.request.user)
@@ -694,6 +710,8 @@ class CustomerProfileView(LoginRequiredMixin, View):
             return redirect("/")
         
 
+    
+
 @login_required
 def complete_payment(request, tran_id, payment_type):
     order = Cart.objects.get(user=request.user, ordered=False)
@@ -713,5 +731,4 @@ def complete_payment(request, tran_id, payment_type):
         order.ordered = True
         order.save()
     return HttpResponseRedirect(reverse('items'))
-
 

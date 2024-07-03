@@ -1,8 +1,10 @@
 {% load static %}
 
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px;">
-    <a href="{% url 'user_profile' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
+
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- User Profile -->
+    <a href="{% url 'user_profile' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-light text-decoration-none">
         <img class="rounded-pill img-fluid" id="sidebar-img" width="65" src="{{ request.user.profile.profile_picture.url }}" alt="">
     </a>
     <div class="ms-2">
@@ -18,79 +20,75 @@
         </span>
     </div>
     <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
+
+    <!-- Nav Items -->
+    <ul class="nav nav-pills flex-column mb-auto text-center">
         <li class="nav-item">
-            <a href="{% url 'dashboard' %}" class="nav-link active" aria-current="page">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
-                Dashboard
+            <a href="{% url 'dashboard' %}" class="nav-link {% if active_pages.dashboard %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Dashboard</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'products_list' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
-                Products
+        <li class="nav-item">
+            <a href="{% url 'products_list' %}" class="nav-link {% if active_pages.products_list %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-boxes"></i>
+                <span>Products</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'sales_list' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-                Sales Orders
+        <li class="nav-item">
+            <a href="{% url 'sales_list' %}" class="nav-link {% if active_pages.sales_list %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-shopping-cart"></i>
+                <span>Sales Orders</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'purchase_list' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-                Purchase Orders
+        <li class="nav-item">
+            <a href="{% url 'purchase_list' %}" class="nav-link {% if active_pages.purchase_list %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-receipt"></i>
+                <span>Purchase Orders</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'deliveries' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Package
+        <li class="nav-item">
+            <a href="{% url 'deliveries' %}" class="nav-link {% if active_pages.deliveries %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-truck"></i>
+                <span>Package</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'invoice_list' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Invoices
+        <li class="nav-item">
+            <a href="{% url 'invoice_list' %}" class="nav-link {% if active_pages.invoice_list %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-file-invoice-dollar"></i>
+                <span>Invoices</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'bill_list' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Bills
+        <li class="nav-item">
+            <a href="{% url 'bill_list' %}" class="nav-link {% if active_pages.bill_list %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-file-invoice"></i>
+                <span>Bills</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'vendor' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Vendors
+        <li class="nav-item">
+            <a href="{% url 'vendor' %}" class="nav-link {% if active_pages.vendor %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-user-tie"></i>
+                <span>Vendors</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'customer_list' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Customers
+        <li class="nav-item">
+            <a href="{% url 'customer_list' %}" class="nav-link {% if active_pages.customer_list %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-users"></i>
+                <span>Customers</span>
             </a>
         </li>
-        <li>
-            <a href="{% url 'profile_list' %}" class="nav-link link-dark">
-                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
-                Staff
+        <li class="nav-item">
+            <a href="{% url 'profile_list' %}" class="nav-link {% if active_pages.profile_list %}active{% endif %}" style="color: white;">
+                <i class="fas fa-fw fa-id-badge"></i>
+                <span>Staff</span>
             </a>
         </li>
     </ul>
     <hr>
-    <div class="dropdown">
-        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-            <strong>mdo</strong>
-        </a>
-        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{% url 'user_logout' %}">Sign out</a></li>
-        </ul>
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
     </div>
-</div>
+
+</ul>
