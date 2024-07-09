@@ -285,6 +285,7 @@ def add_to_cart(request, slug):
         item=item,
         ordered=False
     )
+
     user_cart = Cart.objects.filter(user=request.user, ordered=False)
     if user_cart.exists():
         user_order = user_cart[0]
@@ -295,7 +296,6 @@ def add_to_cart(request, slug):
             messages.info(request, "The quantity was updated")
         else:
             user_order.items.add(ordered_item)
-    # If user does not have any item in the cart create the new instance in the Order model
     else:
         new_order = Cart.objects.create(
             user=request.user,
@@ -303,8 +303,8 @@ def add_to_cart(request, slug):
         )
         new_order.items.add(ordered_item)
         messages.info(request, "The item was added to the cart")
-    return redirect("order_summary")
 
+    return redirect("order_summary")
 
 
 

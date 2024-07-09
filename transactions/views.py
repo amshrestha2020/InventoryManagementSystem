@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from django_tables2.export.views import ExportMixin
 from django_tables2.export.export import TableExport
 from .tables import PurchaseTable, SaleTable
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from accounts.models import Profile
 from django.views.generic import (
     ListView,
@@ -141,7 +141,7 @@ class SaleCreateView(LoginRequiredMixin, CreateView):
     """View to create a new sale."""
     model = Sale
     template_name = 'sales_create.html'
-    fields = ['item', 'first_name', 'payment_method', 'quantity', 'amount_received']
+    fields = ['item', 'customer_name', 'payment_method', 'quantity', 'amount_received']
 
     def get_success_url(self):
         return reverse('sales_list')
@@ -154,7 +154,7 @@ class SaleCreateView(LoginRequiredMixin, CreateView):
         if item.quantity < quantity:
             raise ValidationError(f"Only {item.quantity} units of '{item.name}' are available.")
 
-        price = item.selling_price
+        price = item.price
 
         total_price = price * quantity
 
@@ -165,7 +165,12 @@ class SaleCreateView(LoginRequiredMixin, CreateView):
         balance = amount_received - total_price
         form.instance.balance = balance
 
-        form.instance.profile = self.request.user.profile
+        try:
+            form.instance.profile = self.request.user.profile
+        except ObjectDoesNotExist:
+            messages.error(self.request, "User profile does not exist. Please contact the administrator.")
+            return self.form_invalid(form)
+
         response = super().form_valid(form)
         messages.success(self.request, "Sales has been successfully created.")
         return response

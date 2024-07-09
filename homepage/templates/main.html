@@ -16,18 +16,34 @@
         
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    
+        <style>
+            html, body {
+                height: 100%;
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+            }
+            .content {
+                flex: 1;
+            }
+        </style>
+        
     </head>
     <body>
         <!-- Navigation-->
         {% include "navbar.html" %}
 
-
         <!-- Main Content -->
-        {% block content %}{% endblock content %}
-
+        <div class="content">
+            {% block content %}{% endblock content %}
+        </div>
         <!-- Footer-->
         <footer class="py-5 bg-dark">
-            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+            <div class="container">
+                <p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p>
+            </div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
