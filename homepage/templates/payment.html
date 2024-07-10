@@ -20,7 +20,7 @@
                     {% endfor %}
                 </ul>
                 <p>Discount: ${{ discount }}</p>
-                <form method="post" action="{% url 'apply_promo_code' %}">
+                <form method="post" action="{% url 'add_coupon' %}">
                     {% csrf_token %}
                     <label for="promo_code">Promo Code:</label>
                     <input type="text" id="promo_code" name="promo_code">
@@ -32,7 +32,7 @@
             <!-- Payment Form Section -->
             <div class="col-md-6">
                 <h2>Payment Details</h2>
-                <form method="post" action="{% url 'process_payment' %}">
+                <form method="post" action="" id="payment-form">
                     {% csrf_token %}
                     
                     <!-- Shipping Address -->
@@ -49,110 +49,123 @@
                         <label for="shipping_city">City:</label>
                         <input type="text" id="shipping_city" name="shipping_city" required>
                     </div>
-                  </div>
-                  <div id="card-errors" role="alert"></div>
-              </form>
+
+                    <!-- Payment Method Selection -->
+                    <h3>Payment Method</h3>
+                    <div class="form-group">
+                        <input type="radio" id="cash" name="payment_method" value="cash" checked>
+                        <label for="cash">Cash</label><br>
+                        <input type="radio" id="credit_card" name="payment_method" value="credit_card">
+                        <label for="credit_card">Credit Card</label>
+                    </div>
+
+                    <!-- Credit Card Payment Form -->
+                    <div id="credit-card-form" style="display:none;">
+                        <div class="form-group">
+                            <label for="card-element">Credit or debit card</label>
+                            <div id="card-element">
+                                <!-- A Stripe Element will be inserted here. -->
+                            </div>
+                            <!-- Used to display form errors. -->
+                            <div id="card-errors" role="alert"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit">Submit Payment</button>
+                </form>
             </div>
-
-          </div>
         </div>
-
-        {% include "order_snippet.html" %}
-
-      </div>
-
     </div>
-  </main>
 
-{% endblock content %}
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        // Create a Stripe client.
+        var stripe = Stripe("pk_test_51PYWzyKc4bTFk7ORdCBGY5PB41POV4S7B14GuJUSMoaehNtq4fQtRyvYcFPsb5XDUvGP2P8BKDqZjBrkYmLPwpQZ00apqaf015");
 
-{% block extra_scripts %}
+        // Create an instance of Elements.
+        var elements = stripe.elements();
 
-<script nonce="">  // Create a Stripe client.
-  var stripe = Stripe("pk_test_51PYWzyKc4bTFk7ORdCBGY5PB41POV4S7B14GuJUSMoaehNtq4fQtRyvYcFPsb5XDUvGP2P8BKDqZjBrkYmLPwpQZ00apqaf015");
+        // Custom styling can be passed to options when creating an Element.
+        var style = {
+            base: {
+                color: '#32325d',
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        };
 
-  // Create an instance of Elements.
-  var elements = stripe.elements();
+        // Create an instance of the card Element.
+        var card = elements.create('card', {style: style});
 
-  // Custom styling can be passed to options when creating an Element.
-  // (Note that this demo uses a wider set of styles than the guide below.)
-  var style = {
-    base: {
-      color: '#32325d',
-      fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-      fontSmoothing: 'antialiased',
-      fontSize: '16px',
-      '::placeholder': {
-        color: '#aab7c4'
-      }
-    },
-    invalid: {
-      color: '#fa755a',
-      iconColor: '#fa755a'
-    }
-  };
+        // Add an instance of the card Element into the `card-element` <div>.
+        card.mount('#card-element');
 
-  // Create an instance of the card Element.
-  var card = elements.create('card', {style: style});
+        // Handle real-time validation errors from the card Element.
+        card.on('change', function(event) {
+            var displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
 
-  // Add an instance of the card Element into the `card-element` <div>.
-  card.mount('#card-element');
+        // Show or hide the credit card form based on the selected payment method
+        var paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
+        paymentMethodRadios.forEach(function(radio) {
+            radio.addEventListener('change', function(event) {
+                if (event.target.value === 'credit_card') {
+                    document.getElementById('credit-card-form').style.display = 'block';
+                } else {
+                    document.getElementById('credit-card-form').style.display = 'none';
+                }
+            });
+        });
 
-  // Handle real-time validation errors from the card Element.
-  card.addEventListener('change', function(event) {
-    var displayError = document.getElementById('card-errors');
-    if (event.error) {
-      displayError.textContent = event.error.message;
-    } else {
-      displayError.textContent = '';
-    }
-  });
+        // Handle form submission.
+        var form = document.getElementById('payment-form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
 
-  // Handle form submission.
-  var form = document.getElementById('stripe-form');
-  form.addEventListener('submit', function(event) {
-    event.preventDefault();
+            var selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            if (selectedPaymentMethod === 'credit_card') {
+                stripe.createToken(card).then(function(result) {
+                    if (result.error) {
+                        // Inform the user if there was an error.
+                        var errorElement = document.getElementById('card-errors');
+                        errorElement.textContent = result.error.message;
+                    } else {
+                        // Send the token to your server.
+                        stripeTokenHandler(result.token);
+                    }
+                });
+            } else {
+                // Submit the form normally for cash payment
+                form.submit();
+            }
+        });
 
-    stripe.createToken(card).then(function(result) {
-      if (result.error) {
-        // Inform the user if there was an error.
-        var errorElement = document.getElementById('card-errors');
-        errorElement.textContent = result.error.message;
-      } else {
-        // Send the token to your server.
-        stripeTokenHandler(result.token);
-      }
-    });
-  });
+        // Submit the form with the token ID.
+        function stripeTokenHandler(token) {
+            // Insert the token ID into the form so it gets submitted to the server
+            var form = document.getElementById('payment-form');
+            var hiddenInput = document.createElement('input');
+            hiddenInput.setAttribute('type', 'hidden');
+            hiddenInput.setAttribute('name', 'stripeToken');
+            hiddenInput.setAttribute('value', token.id);
+            form.appendChild(hiddenInput);
 
-  // Submit the form with the token ID.
-  function stripeTokenHandler(token) {
-    // Insert the token ID into the form so it gets submitted to the server
-    var form = document.getElementById('stripe-form');
-    var hiddenInput = document.createElement('input');
-    hiddenInput.setAttribute('type', 'hidden');
-    hiddenInput.setAttribute('name', 'stripeToken');
-    hiddenInput.setAttribute('value', token.id);
-    form.appendChild(hiddenInput);
-
-    // Submit the form
-    form.submit();
-  }
-
-  var currentCardForm = $('.current-card-form');
-  currentCardForm.hide()
-  var newCardForm = $('.new-card-form');
-  var use_default_card = document.querySelector("input[name=use_default_card]");
-  use_default_card.addEventListener('change', function() {
-    if (this.checked) {
-      newCardForm.hide();
-      currentCardForm.show()
-    } else {
-      newCardForm.show();
-      currentCardForm.hide()
-    }
-  })
-
-</script>
-
-{% endblock extra_scripts %}
+            // Submit the form
+            form.submit();
+        }
+    </script>
+</body>
+</html>

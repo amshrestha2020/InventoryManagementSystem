@@ -15,6 +15,9 @@ from django.conf import settings
 from django_countries import countries
 from django_countries.fields import CountryField
 from django.db.models.signals import post_save
+from decimal import Decimal
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 
 
@@ -141,16 +144,30 @@ class OrderItem(models.Model):
 
     def get_total_price(self):
         return self.item.price * self.quantity
+
+
+    def get_discounted_price(self):
+        return self.item.discount_price if self.item.discount_price else self.item.price
+
     
     def get_total_discount_price(self):
-        return self.item.discount_price * self.quantity
+        return self.quantity * self.item.discount_price if self.item.discount_price else self.get_total_price()
+    
+    def get_tax(self):
+        return 0.1 * self.get_total_price()  # assuming 10% tax
+    
+    # def get_final_price(self):
+    #     if self.item.discount_price:
+    #         return self.get_total_discount_price()
+    #     else:
+    #         return self.get_total_price()
+
 
     def get_final_price(self):
-        if self.item.discount_price:
-            return self.get_total_discount_price()
-        else:
-            return self.get_total_price()
-
+        total_price = self.get_total_price()
+        total_discount = self.get_total_discount_price()
+        tax = self.get_tax()
+        return total_price + tax - total_discount
 
 
 
@@ -206,6 +223,7 @@ class Cart(models.Model):
     received = models.BooleanField(default=False)
     refund_requested = models.BooleanField(default=False)
     refund_granted = models.BooleanField(default=False)
+    shipping_charge = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Ensure a default value is provided
 
     def __str__(self):
         return self.user.username
@@ -217,7 +235,24 @@ class Cart(models.Model):
         if self.coupon is not None:
             total -= self.coupon.amount
         return total
+    
 
+    def get_total_price(self):
+        return sum(item.get_total_price() for item in self.items.all())
+
+    def get_total_discount_price(self):
+        return sum(item.get_total_discount_price() for item in self.items.all())
+
+    def get_tax(self):
+        return 0.1 * self.get_total_price()  # assuming 10% tax
+
+    def get_final_price(self):
+        total_price = Decimal(self.get_total_price())
+        shipping_charge = Decimal(self.shipping_charge)
+        tax = Decimal(self.get_tax())
+        total_discount_price = Decimal(self.get_total_discount_price())
+        
+        return total_price + shipping_charge + tax - total_discount_price
 
 class Refund(models.Model):
     order = models.ForeignKey(Cart, on_delete=models.CASCADE)
@@ -326,11 +361,14 @@ class Variants(models.Model):
 
 
 
-
+@receiver(post_save, sender=User)
 def user_profile_receiver(sender, instance, created, *args, **kwargs):
     if created:
         user_profile = UserProfile.objects.create(user=instance)
 
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.userprofile.save()
 
 # Signal to create user profile every time a new user is created
 post_save.connect(user_profile_receiver, sender=settings.AUTH_USER_MODEL)

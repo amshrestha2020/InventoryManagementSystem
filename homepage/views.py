@@ -296,16 +296,21 @@ def add_to_cart(request, slug):
             messages.info(request, "The quantity was updated")
         else:
             user_order.items.add(ordered_item)
+            messages.info(request, "The item was added to the cart")
     else:
         new_order = Cart.objects.create(
             user=request.user,
             ordered_date=timezone.now(),
+            shipping_charge=5.00  # Example fixed shipping charge
         )
         new_order.items.add(ordered_item)
         messages.info(request, "The item was added to the cart")
 
     return redirect("order_summary")
 
+def calculate_shipping_charge(order):
+    # Implement your logic to calculate the shipping charge
+    return 5.00  # Example fixed shipping charge
 
 
 @login_required
@@ -535,7 +540,7 @@ class PaymentView(LoginRequiredMixin, View):
             return redirect('ssl_payment')
         try:
             order = Cart.objects.get(user=self.request.user, ordered=False)
-            user_profile = self.request.user.userprofile
+            user_profile, created = UserProfile.objects.get_or_create(user=self.request.user)
             if order.items.count() == 0:
                 messages.info(self.request, "No item in your cart")
                 return redirect("item_list")
@@ -543,7 +548,8 @@ class PaymentView(LoginRequiredMixin, View):
                 context = {
                     "orders": order,
                     'coupon_form': CouponForm(),
-                    'DISPLAY_COUPON_FORM': False
+                    'DISPLAY_COUPON_FORM': False,
+                    'cash_payment': True  # Default to cash payment
                 }
                 
                 if user_profile.on_click_purchasing:
@@ -555,7 +561,8 @@ class PaymentView(LoginRequiredMixin, View):
                     cards = card_list['data']
                     if len(cards) > 0:
                         context.update({
-                            "card": cards[0]
+                            "card": cards[0],
+                            'cash_payment': False  # If card is available, set cash payment to False
                         })
                 return render(self.request, 'payment.html', context)
             else:
@@ -572,6 +579,14 @@ class PaymentView(LoginRequiredMixin, View):
         stripe_charge_token = self.request.POST.get('stripeToken')
         save = self.request.POST.get('save')
         user_default = self.request.POST.get('use_default')
+        payment_method = self.request.POST.get('payment_method')
+
+        if payment_method == 'cash':
+            # Handle cash payment
+            order.ordered = True
+            order.save()
+            messages.success(self.request, "Cash Payment Successful")
+            return redirect('complete_payment', tran_id=order.id, payment_type="C")
 
         # To do for if the user wants to save card information for future purpose or not
         if save:
@@ -656,7 +671,7 @@ class PaymentView(LoginRequiredMixin, View):
             messages.warning(
                 self.request, "A serious error occurred. We have been notified.")
             return redirect("payment", payment_option="Stripe")
-    
+
 
 
 class RequestRefundView(LoginRequiredMixin, View):
@@ -711,24 +726,35 @@ class CustomerProfileView(LoginRequiredMixin, View):
         
 
     
-
 @login_required
 def complete_payment(request, tran_id, payment_type):
-    order = Cart.objects.get(user=request.user, ordered=False)
-    amount = int(order.get_total())
-    payment = Payment()
-    payment.user = request.user
-    payment.amount = amount
-    payment.stripe_charge_id = tran_id
-    payment.save()
+    try:
+        order = Cart.objects.get(user=request.user, ordered=False)
+        amount = int(order.get_total())
 
-    order.ordered = True
-    order.payment = payment
-    order.reference_code = generate_reference_code()
-    order.save()
-    users_order = OrderItem.objects.filter(user=request.user, ordered=False)
-    for order in users_order:
+        payment = Payment()
+        payment.user = request.user
+        payment.amount = amount
+        payment.stripe_charge_id = tran_id if payment_type == 'credit_card' else None
+        payment.save()
+
         order.ordered = True
+        order.payment = payment
+        order.reference_code = generate_reference_code()
+        order.shipping_charge = calculate_shipping_charge(order)  # Set the shipping charge here
         order.save()
-    return HttpResponseRedirect(reverse('items'))
 
+        users_order = OrderItem.objects.filter(user=request.user, ordered=False)
+        for order_item in users_order:
+            order_item.ordered = True
+            order_item.save()
+
+        return HttpResponseRedirect(reverse('items'))
+    except Cart.DoesNotExist:
+        messages.error(request, "You do not have an active order")
+        return redirect('items')
+
+
+def calculate_shipping_charge(order):
+    # Implement your logic to calculate the shipping charge
+    return 5.00  # Example fixed shipping charge

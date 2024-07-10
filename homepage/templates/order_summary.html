@@ -4,81 +4,44 @@
 <html lang="en">
 
 <head>
-    <link href="{% static 'css/main.css' %}" rel="stylesheet" />
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css"
-        integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous" />
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-beta1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 
 <body>
     {% block content %}
-    <main>
         <div class="container">
             <div class="row">
                 <h4 class="text-center my-4">Order Summary</h4>
 
-                <div class="col-xl-8">
+                <div class="col-lg-8">
                     {% for order_item in object.items.all %}
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start border-bottom pb-3">
-                                <div class="me-4">
-                                    <img src="{{ order_item.item.item_image.url }}" alt="" class="avatar-lg rounded">
-                                </div>
-                                <div class="flex-grow-1 align-self-center overflow-hidden">
-                                    <div>
-                                        <h5 class="text-truncate font-size-18"><a href="#" class="text-dark">{{ order_item.item.item_name }}</a></h5>
-                                        <p class="text-muted mb-0">
-                                            <i class="bx bxs-star text-warning"></i>
-                                            <i class="bx bxs-star text-warning"></i>
-                                            <i class="bx bxs-star text-warning"></i>
-                                        </p>
-                                        <p class="mb-0 mt-1">Color: <span class="fw-medium">{{ order_item.item.color }}</span></p>
-                                    </div>
-                                </div>
-                                <div class="flex-shrink-0 ms-2">
-                                    <ul class="list-inline mb-0 font-size-16">
-                                        <li class="list-inline-item">
-                                            <a href="{% url 'remove_from_the_cart' order_item.item.slug %}" class="text-muted px-1">
-                                                <i class="mdi mdi-trash-can-outline"></i>
-                                            </a>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            <a href="#" class="text-muted px-1">
-                                                <i class="mdi mdi-heart-outline"></i>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="{{ order_item.item.item_image.url }}" alt="{{ order_item.item.item_name }}" class="img-fluid rounded-start">
                             </div>
-
-                            <div class="row mt-3">
-                                <div class="col-md-4">
-                                    <p class="text-muted mb-2">Price</p>
-                                    <h5 class="mb-0">
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ order_item.item.item_name }}</h5>
+                                    <p class="card-text">Color: <span class="fw-bold">{{ order_item.item.color }}</span></p>
+                                    <p class="card-text">Quantity: <span class="fw-bold">{{ order_item.quantity }}</span></p>
+                                    <p class="card-text">Price: 
                                         {% if order_item.item.discount_price %}
-                                        <span class="text-muted me-2"><del class="font-size-16 fw-normal">${{ order_item.item.price }}</del></span>${{ order_item.item.discount_price }}
+                                        <span class="text-muted me-2">${{ order_item.item.price }}</span> Discounted Price: ${{ order_item.get_discounted_price }}
                                         {% else %}
                                         ${{ order_item.item.price }}
                                         {% endif %}
-                                    </h5>
-                                </div>
-                                <div class="col-md-5">
-                                    <p class="text-muted mb-2">Quantity</p>
-                                    <div class="d-inline-flex">
-                                        <input type="number" class="form-control form-control-sm" value="{{ order_item.quantity }}" min="1">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <p class="text-muted mb-2">Total</p>
-                                    <h5>
+                                    </p>
+                                    <p class="card-text">Total: 
                                         {% if order_item.item.discount_price %}
                                         ${{ order_item.get_total_discount_price }}
                                         {% else %}
                                         ${{ order_item.get_total_price }}
                                         {% endif %}
-                                    </h5>
+                                    </p>
+                                    
+                                    <a href="{% url 'remove_from_the_cart' order_item.item.slug %}" class="btn btn-outline-danger btn-sm">Remove</a>
                                 </div>
                             </div>
                         </div>
@@ -86,66 +49,49 @@
                     {% endfor %}
                 </div>
 
-                <div class="col-xl-4 order-summary">
-                    <div class="card">
-                        {% for order_item in object.items.all %}
-                        <div class="card-header">
-                            {% if order_item.item.item_name %}
-                            <h5 class="font-size-16 mb-0">Order Summary <span class="float-end">#{{ object.items.all }}</span></h5>
-                            {% endif %}
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-transparent">
+                            <h5 class="font-size-16 mb-0">Order Summary</h5>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <td>Sub Total :</td>
-                                            {% if order_item.item.discount_price %}
-                                            <td class="text-end">$ {{ object.get_total_price }}</td>
-                                            {% endif %}
-                                        </tr>
-                                        <tr>
-                                            <td>Discount : </td>
-                                            {% if order_item.item.discount_price %}
-                                            <td class="text-end">- $ {{ object.get_total_discount_price }}</td>
-                                            {% endif %}
-                                        </tr>
-                                        <tr>
-                                            <td>Shipping Charge :</td>
-                                            <td class="text-end">$ {{ object.shipping_charge }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Estimated Tax : </td>
-                                            <td class="text-end">$ {{ object.get_tax }}</td>
-                                        </tr>
-                                        <tr class="bg-light">
-                                            <th>Total :</th>
-                                            {% if order_item.item.discount_price %}
-                                            <td class="text-end">
-                                                <span class="fw-bold">$ {{ object.get_final_price }}</span>
-                                            </td>
-                                            {% endif %}
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            {% comment %} {% for order_item in object.items.all %} {% endcomment %}
+                                <!-- Display each order item if needed -->
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Sub Total
+                                    <span>$ {{ object.get_total_price }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Discount
+                                    <span>- $ {{ object.get_total_discount_price }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Shipping Charge
+                                    <span>$ {{ object.shipping_charge }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Estimated Tax
+                                    <span>$ {{ object.get_tax }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Total
+                                    <span class="fw-bold">$ {{ object.get_final_price }}</span>
+                                </li>
+                            </ul>
 
-                            <div class="d-flex justify-content-between mt-4">
-                                <a href="{% url 'items' %}" class="btn btn-link">
-                                    <i class="mdi mdi-arrow-left me-1"></i> Continue Shopping
-                                </a>
-                                <a href="{% url 'checkout' %}" class="btn btn-success">
-                                    <i class="mdi mdi-cart-outline me-1"></i> Checkout
-                                </a>
+                            {% comment %} {% endfor %} {% endcomment %}
+
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="{% url 'items' %}" class="btn btn-outline-primary">Continue Shopping</a>
+                                <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
                 </div>
 
             </div>
         </div>
-    </main>
     {% endblock %}
 </body>
 
