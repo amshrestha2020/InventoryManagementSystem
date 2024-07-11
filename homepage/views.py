@@ -301,8 +301,7 @@ def add_to_cart(request, slug):
         new_order = Cart.objects.create(
             user=request.user,
             ordered_date=timezone.now(),
-            shipping_charge=5.00,  # Example fixed shipping charge
-            amount_received=0.00  # Ensure to set this value
+            shipping_charge=5.00  # Example fixed shipping charge
 
         )
         new_order.items.add(ordered_item)
