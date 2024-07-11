@@ -64,8 +64,16 @@
                   <input id="{{ name }}" name="payment_option" value="{{ value }}" type="radio" class="form-check-input" required>
                   <label class="form-check-label" for="{{ name }}">{{ name }}</label>
                 </div>
-                {% endfor %}
               </div>
+
+              <!-- Dynamic Input Field for CASH Option -->
+              <div id="cash-info" style="display: none;">
+                <div class="mb-3">
+                  <label for="cash_details" class="form-label">Additional Details for CASH Payment</label>
+                  <input type="text" class="form-control" id="cash_details" name="cash_details">
+                </div>
+              </div>
+              {% endfor %}
 
               <button class="btn btn-primary btn-lg btn-block mt-4" type="submit">Continue to Checkout</button>
             </form>
@@ -89,6 +97,8 @@
   const useDefaultShipping = document.querySelector('input[name=use_default_shipping]');
   const useDefaultBilling = document.querySelector('input[name=use_default_billing]');
   const sameBillingAddress = document.querySelector('input[name=same_billing_address]');
+  const cashOption = document.querySelector('input[value="C"]');
+  const cashInfo = document.getElementById('cash-info');
 
   function toggleVisibility(checkbox, form) {
     checkbox.addEventListener('change', function() {
@@ -99,5 +109,9 @@
   if (useDefaultShipping) toggleVisibility(useDefaultShipping, hideableShippingForm);
   if (useDefaultBilling) toggleVisibility(useDefaultBilling, hideableBillingForm);
   if (sameBillingAddress) toggleVisibility(sameBillingAddress, hideableBillingForm);
+
+  cashOption.addEventListener('change', function() {
+    cashInfo.style.display = this.checked ? 'block' : 'none';
+  });
 </script>
 {% endblock %}

@@ -44,6 +44,7 @@ class CheckoutForm(forms.Form):
 
     # Payment Method
     payment_option = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICE_FIELDS)
+    cash_details = forms.CharField(required=False)  # Add this field
 
 
 

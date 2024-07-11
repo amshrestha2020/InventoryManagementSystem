@@ -301,7 +301,9 @@ def add_to_cart(request, slug):
         new_order = Cart.objects.create(
             user=request.user,
             ordered_date=timezone.now(),
-            shipping_charge=5.00  # Example fixed shipping charge
+            shipping_charge=5.00,  # Example fixed shipping charge
+            amount_received=0.00  # Ensure to set this value
+
         )
         new_order.items.add(ordered_item)
         messages.info(request, "The item was added to the cart")
@@ -468,7 +470,7 @@ class CheckoutView(LoginRequiredMixin, View):
                         order.billing_address = billing
                         order.save()
                     else:
-                        messages.info(self.request, "No default shipping")
+                        messages.info(self.request, "No default billing")
                         return redirect("checkout")
                 else:
                     billing_address = form.cleaned_data.get('billing_address')
@@ -490,22 +492,26 @@ class CheckoutView(LoginRequiredMixin, View):
                         order.billing_address = billing
                         order.save()
                     else:
-                        messages.info(self.request, "Please fill the in billing form properly")
+                        messages.info(self.request, "Please fill in the billing form properly")
                         return redirect("checkout")
                 # Payment Handling
                 payment_option = form.cleaned_data.get('payment_option')
+                cash_details = form.cleaned_data.get('cash_details')  # Get cash details
                 if payment_option == "S":
-                    return redirect("payment", payment_option="Stripe")
+                    return redirect("payment_option", payment_option="Stripe")
                 elif payment_option == "P":
-                    return redirect("payment", payment_option="Paypal")
+                    return redirect("payment_option", payment_option="Paypal")
                 elif payment_option == "C":
-                    return redirect("payment", payment_option="CASH")
+                    # Pass cash details if needed
+                    return redirect("payment_option", payment_option="CASH")
                 else:
-                    # add redirect to selected payment method
+                    # Add redirect to selected payment method
                     return redirect("checkout")
         except ObjectDoesNotExist:
-            messages.error(self.request, "Error ")
+            messages.error(self.request, "Error")
             return redirect("checkout")
+
+
 
 
 class AddCouponView(LoginRequiredMixin, View):
@@ -532,6 +538,72 @@ def generate_reference_code():
 
 
 
+class PaymentProcessor:
+    def __init__(self, request):
+        self.request = request
+        self.user = request.user
+
+    def handle_cash_payment(self, order):
+        order.ordered = True
+        order.save()
+        messages.success(self.request, "Cash Payment Successful")
+        return redirect('complete_payment', tran_id=order.id, payment_type="C")
+
+    def handle_stripe_payment(self, order, stripe_charge_token, save, user_default):
+        userprofile = UserProfile.objects.get(user=self.user)
+        amount = int(order.get_total())
+        
+        # Handle save card information
+        if save:
+            if not userprofile.stripe_customer_id:
+                customer = stripe.Customer.create(
+                    email=str(self.user.email),
+                    name=self.user.username
+                )
+                customer.create(source=stripe_charge_token)
+                userprofile.stripe_customer_id = customer['id']
+                userprofile.on_click_purchasing = True
+                userprofile.save()
+            else:
+                customer = stripe.Customer.retrieve(userprofile.stripe_customer_id)
+                customer.create(source=stripe_charge_token)
+        
+        try:
+            if user_default or save:
+                charge = stripe.Charge.create(
+                    amount=amount*100,
+                    currency="usd",
+                    customer=userprofile.stripe_customer_id
+                )
+            else:
+                charge = stripe.Charge.create(
+                    amount=amount*100,
+                    currency="usd",
+                    source=stripe_charge_token
+                )
+            messages.success(self.request, "Stripe Payment Successful")
+            return redirect('complete_payment', tran_id=charge['id'], payment_type="S")
+        
+        except stripe.error.CardError as e:
+            self.handle_stripe_error(e)
+        except stripe.error.RateLimitError as e:
+            messages.warning(self.request, "Rate limit error")
+        except stripe.error.InvalidRequestError as e:
+            messages.warning(self.request, "Invalid parameters")
+        except stripe.error.AuthenticationError as e:
+            messages.warning(self.request, "Not authenticated")
+        except stripe.error.APIConnectionError as e:
+            messages.warning(self.request, "Network error")
+        except stripe.error.StripeError as e:
+            messages.warning(self.request, "Something went wrong. You were not charged. Please try again.")
+        except Exception as e:
+            messages.warning(self.request, "A serious error occurred. We have been notified.")
+        return redirect("payment", payment_option="Stripe")
+    
+    def handle_stripe_error(self, e):
+        body = e.json_body
+        err = body.get('error', {})
+        messages.warning(self.request, f"{err.get('message')}")
 
 class PaymentView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
@@ -574,103 +646,17 @@ class PaymentView(LoginRequiredMixin, View):
         
     def post(self, *args, **kwargs):
         order = Cart.objects.get(user=self.request.user, ordered=False)
-        userprofile = UserProfile.objects.get(user=self.request.user)
-        amount = int(order.get_total())
         stripe_charge_token = self.request.POST.get('stripeToken')
         save = self.request.POST.get('save')
         user_default = self.request.POST.get('use_default')
         payment_method = self.request.POST.get('payment_method')
 
+        payment_processor = PaymentProcessor(self.request)
+
         if payment_method == 'cash':
-            # Handle cash payment
-            order.ordered = True
-            order.save()
-            messages.success(self.request, "Cash Payment Successful")
-            return redirect('complete_payment', tran_id=order.id, payment_type="C")
-
-        # To do for if the user wants to save card information for future purpose or not
-        if save:
-            """
-            If user is not registered with stripe_customer_id Create the new customer instance
-            and store information to the UserProfile model
-            Otherwise retrieve the user information from the UserProfile model
-            Pass the already stored stripe_customer_id as the source value
-            To create a new source in the stripe db
-            """
-            if not userprofile.stripe_customer_id:
-                customer = stripe.Customer.create(
-                    email=str(self.request.user.email),
-                    name=self.request.user.username
-                )
-                customer.create(source=stripe_charge_token)
-                userprofile.stripe_customer_id = customer['id']
-                userprofile.on_click_purchasing = True
-                userprofile.save()
-            else:
-                customer = stripe.Customer.retrieve(
-                    userprofile.stripe_customer_id)
-                
-                customer.create(source=stripe_charge_token)
-
-        # To do for saving payment information
-        try:
-            """
-            If the user wants to use the previous default card retrieve the stripe_customer_id
-            from the UserProfile model and pass that to stripe api source to create charges
-            Otherwise create the charges using the token generated by stripe
-            """
-            if user_default or save:
-                charge = stripe.Charge.create(
-                    amount=amount*100,
-                    currency="usd",
-                    customer=userprofile.stripe_customer_id
-                )
-            else:
-                charge = stripe.Charge.create(
-                    amount=amount*100,
-                    currency="usd",
-                    source=stripe_charge_token
-                )
-            messages.success(self.request, "Stripe Payment Successful")
-            return redirect('complete_payment', tran_id=charge['id'], payment_type="S")
-
-        except stripe.error.CardError as e:
-            body = e.json_body
-            err = body.get('error', {})
-            messages.warning(self.request, f"{err.get('message')}")
-            return redirect("payment", payment_option="Stripe")
-
-        except stripe.error.RateLimitError as e:
-            # Too many requests made to the API too quickly
-            messages.warning(self.request, "Rate limit error")
-            return redirect("payment", payment_option="Stripe")
-
-        except stripe.error.InvalidRequestError as e:
-            # Invalid parameters were supplied to Stripe's API
-            messages.warning(self.request, "Invalid parameters")
-            return redirect("payment", payment_option="Stripe")
-
-        except stripe.error.AuthenticationError as e:
-            # Authentication with Stripe's API failed
-            # (maybe you changed API keys recently)
-            messages.warning(self.request, "Not authenticated")
-            return redirect("payment", payment_option="Stripe")
-
-        except stripe.error.APIConnectionError as e:
-            # Network communication with Stripe failed
-            messages.warning(self.request, "Network error")
-            return redirect("payment", payment_option="Stripe")
-
-        except stripe.error.StripeError as e:
-            messages.warning(
-                self.request, "Something went wrong. You were not charged. Please try again.")
-            return redirect("payment", payment_option="Stripe")
-
-        except Exception as e:
-            # Send an email to ourselves
-            messages.warning(
-                self.request, "A serious error occurred. We have been notified.")
-            return redirect("payment", payment_option="Stripe")
+            return payment_processor.handle_cash_payment(order)
+        else:
+            return payment_processor.handle_stripe_payment(order, stripe_charge_token, save, user_default)
 
 
 
